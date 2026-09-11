@@ -6,7 +6,7 @@
 
 #include "LogicMaze.hpp"
 
-const int MAZE_MIN_SIZE = 3;
+constexpr int MAZE_MIN_SIZE = 3;
 
 enum class Cell : std::uint8_t
 {
@@ -19,7 +19,7 @@ class Maze
 {
 public:
   Maze(int width, int height);
-  Maze(int width, int height, LogicMaze& logicMaze);
+  Maze(int width, int height, const LogicMaze& logicMaze);
 
   [[nodiscard]]
   bool isInside(int x, int y) const;
@@ -40,5 +40,4 @@ private:
   int width_;
   int height_;
   std::vector<Cell> cells_;
-  int unbuiltCells;
 };

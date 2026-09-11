@@ -11,14 +11,14 @@ Maze::Maze(int width, int height)
   cells_.assign(width * height, Cell::Wall);
 }
 
-Maze::Maze(int width, int height, LogicMaze& logicMaze)
+Maze::Maze(int width, int height, const LogicMaze& logicMaze)
 : width_(width),
   height_(height)
 {
   cells_.assign(width * height, Cell::Wall);
   for (int i = 0; i < logicMaze.size(); ++i){
     size_t logicX = i % logicMaze.width;
-    size_t logicY = i / logicMaze.height;
+    size_t logicY = i / logicMaze.width;
     size_t cellX = logicX * 2 + 1;
     size_t cellY = logicY * 2 + 1;
     uint8_t data = logicMaze.data[i];

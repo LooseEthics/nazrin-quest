@@ -29,7 +29,7 @@ bool isValidLogicDir(size_t cellIndex, uint8_t dir, size_t logicWidth, size_t lo
   }
 }
 
-size_t getNeightbourLogicCell(size_t cellIndex, uint8_t dir, size_t logicWidth)
+size_t getNeighbourLogicCell(size_t cellIndex, uint8_t dir, size_t logicWidth)
 {
   // assumes direction is valid
   switch(dir){
@@ -73,7 +73,7 @@ void MazeGenerator::LERW(size_t branchStart, size_t maxLength)
       dir = dirDistribution_(rng_);
     // std::cout << "dir: " << (int)dir << "\n";
 
-    nextIndex = getNeightbourLogicCell(index, dir, logicMaze_.width);
+    nextIndex = getNeighbourLogicCell(index, dir, logicMaze_.width);
     // std::cout << "next: " << nextIndex << "\n";
 
     auto it = find(branch_.begin(), branch_.end(), nextIndex);

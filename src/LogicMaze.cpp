@@ -13,9 +13,8 @@ LogicMaze::LogicMaze(size_t width, size_t height)
 }
 
 LogicMaze::LogicMaze()
-{
-  LogicMaze(1, 1);
-}
+  : LogicMaze(1, 1)
+{}
 
 size_t LogicMaze::size() const noexcept
 {
@@ -43,19 +42,19 @@ size_t LogicMaze::getNextUnbuilt(size_t offset) const noexcept
 {
   // std::cout << "getNextUnbuilt offset " << offset << "\n";
   // std::cout << "getNextUnbuilt size " << size() << "\n";
+  if (unbuiltCells == 0) return size();
   offset = offset % unbuiltCells;
   size_t index = 0;
   for (; offset > 0; ++index){
     // std::cout << index << ":" << offset << "\n";
-    if ((data[index] & 0x10) == 0) offset -= 1;
     if (index >= size()) index = 0;
+    if ((data[index] & 0x10) == 0) offset -= 1;
   }
-  if (index >= size()) index = 0;
   // std::cout << "getNextUnbuilt index " << index << "\n";
   // std::cout << "getNextUnbuilt data " << data[index] << "\n";
   for (;; ++index){
-    if ((data[index] & 0x10) == 0) break;
     if (index >= size()) index = 0;
+    if ((data[index] & 0x10) == 0) break;
   }
   // std::cout << "getNextUnbuilt index " << index << "\n";
   return index;
