@@ -51,6 +51,59 @@ size_t getNeightbourLogicCell(size_t cellIndex, uint8_t dir, size_t logicWidth)
   }
 }
 
+void MazeGenerator::LERW(size_t branchStart, size_t maxLength)
+{
+  branch_.push_back(branchStart);
+  size_t index, nextIndex = -1;
+  uint8_t dir = -1;
+  while (
+    ((nextIndex != -1) && (logicMaze_.data[nextIndex] & 0x10 == 0))
+    || ((maxLength > 0) && (branch_.size() < maxLength))
+  ){
+    index = branch_.back();
+    while (!isValidLogicDir(index, dir, logicMaze_.width, logicMaze_.height))
+      dir = dirDistribution_(rng_);
+    nextIndex = getNeightbourLogicCell(index, dir, logicMaze_.width);
+    auto it = find(branch_.begin(), branch_.end(), nextIndex);
+    if (it == branch_.end()){
+      branch_.push_back(index);
+      dirVector_.push_back(dir);
+    }
+    else {
+      size_t dist = distance(branch_.begin(), it);
+      branch_.resize(dist);
+      dirVector_.resize(dist - 1);
+    }
+  }
+}
+
+void MazeGenerator::insertBranch()
+{
+  size_t index;
+  uint8_t dir;
+  for (int i = 0; i < branch_.size() - 1; ++i){
+    index = branch_[i];
+
+    logicMaze_.data[index] |= 0x10; // cell built
+
+    // entry direction
+    if (i != 0){
+      logicMaze_.data[index] |= (0x1 << dir);
+    }
+
+    // exit direction
+    dir = dirVector_[i];
+    logicMaze_.data[index] |= (0x1 << dir);
+
+    // reverse exit direction for next cell
+    dir = (dir + 2) % 4;
+  }
+
+  // last cell
+  index = branch_.back();
+  logicMaze_.data[index] |= 0x10 || (0x1 << dir);
+}
+
 Maze MazeGenerator::generate(int width, int height)
 {
   if (width < MAZE_MIN_SIZE || height < MAZE_MIN_SIZE){
@@ -64,41 +117,27 @@ Maze MazeGenerator::generate(int width, int height)
     return Maze(MAZE_MIN_SIZE, MAZE_MIN_SIZE);
   }
 
-  size_t logicWidth = (width - 1) / 2;
-  size_t logicHeight = (height - 1) / 2;
-  std::vector<LogicCell> logicMaze{logicWidth * logicHeight};
+  logicMaze_ = LogicMaze{
+    static_cast<size_t>((width - 1) / 2),
+    static_cast<size_t>((height - 1) / 2)};
 
-  std::uniform_int_distribution<size_t> cellDistribution{0, logicWidth * logicHeight - 1};
-  std::uniform_int_distribution<uint8_t> dirDistribution{0, 3};
+  cellDistribution_ = std::uniform_int_distribution<size_t>{0, logicMaze_.size() - 1};
 
   // initial branch
-  size_t startIndex = cellDistribution(rng_);
-  size_t initialBranchLength = (logicWidth + logicHeight) / 2;
-  std::vector<size_t> initialBranch;
-  uint8_t dir = -1;
-  std::vector<size_t> dirVector;
-  size_t lastIndex, nextIndex;
+  size_t startIndex = cellDistribution_(rng_);
+  size_t initialBranchLength = (logicMaze_.width + logicMaze_.height) / 2;
 
-  initialBranch.push_back(startIndex);
-  while (initialBranch.size() < initialBranchLength){
-    lastIndex = initialBranch.back();
-    while (!isValidLogicDir(lastIndex, dir, logicWidth, logicHeight))
-      dir = dirDistribution(rng_);
-    nextIndex = getNeightbourLogicCell(lastIndex, dir, logicWidth);
-    auto it = find(initialBranch.begin(), initialBranch.end(), nextIndex);
-    if (it == initialBranch.end()){
-      initialBranch.push_back(nextIndex);
-      dirVector.push_back(dir);
-    }
-    else{
-      size_t dist = distance(initialBranch.begin(), it)
-      initialBranch.resize(dist);
-      dirVector.resize(dist - 1);
-    }
-  }
+  LERW(startIndex, initialBranchLength);
+
+  logicMaze_.data[startIndex] |= 0x20;
+  insertBranch();
+
+  branch_.clear();
+
   // branch from random unbuilt lc until exhausted
 
 
-  Maze maze{width, height};
+  Maze maze{width, height, logicMaze_};
+  maze.printMazeToConsole();
   return maze;
 }

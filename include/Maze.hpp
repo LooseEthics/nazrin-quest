@@ -1,6 +1,10 @@
 
+#pragma once
+
 #include <cstdint>
 #include <vector>
+
+#include "LogicMaze.hpp"
 
 const int MAZE_MIN_SIZE = 3;
 
@@ -14,6 +18,7 @@ class Maze
 {
 public:
   Maze(int width, int height);
+  Maze(int width, int height, LogicMaze& logicMaze);
 
   [[nodiscard]]
   bool isInside(int x, int y) const;

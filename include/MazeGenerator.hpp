@@ -1,24 +1,13 @@
 
 #include <cstdint>
 #include <random>
+#include <vector>
 
+#include "LogicMaze.hpp"
 #include "Maze.hpp"
-
-struct LogicCell
-{
-  // 0x1 east passage
-  // 0x2 south passage
-  // 0x4 west passage
-  // 0x8 north passage
-  // 0x10 is built
-  // 0x11 is start
-  // 0x12 is goal
-  uint8_t data;
-};
 
 class MazeGenerator
 {
-  // LERW
 public:
   MazeGenerator(std::uint32_t seed);
 
@@ -27,4 +16,14 @@ public:
 
 private:
   std::mt19937 rng_;
+
+  LogicMaze logicMaze_;
+  std::vector<size_t> branch_;
+  std::vector<uint8_t> dirVector_;
+
+  std::uniform_int_distribution<size_t> cellDistribution_;
+  std::uniform_int_distribution<uint8_t> dirDistribution_{0, 3};
+
+  void LERW(size_t branchStart, size_t maxLength = 0);
+  void insertBranch();
 };
