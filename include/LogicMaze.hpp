@@ -20,9 +20,13 @@ public:
   // 0x20 is start
   // 0x40 is goal
   std::vector<uint8_t> data;
+  int unbuiltCells;
 
   [[nodiscard]]
   size_t size() const noexcept;
 
   void printHexes() const;
+
+  [[nodiscard]]
+  size_t getNextUnbuilt(size_t offset) const noexcept;
 };

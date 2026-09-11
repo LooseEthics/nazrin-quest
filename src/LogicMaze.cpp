@@ -6,7 +6,8 @@
 
 LogicMaze::LogicMaze(size_t width, size_t height)
   : width(width),
-    height(height)
+    height(height),
+    unbuiltCells(width * height)
 {
   data.assign(width * height, 0);
 }
@@ -36,4 +37,26 @@ void LogicMaze::printHexes() const
     }
 
     std::cout << std::dec;
+}
+
+size_t LogicMaze::getNextUnbuilt(size_t offset) const noexcept
+{
+  // std::cout << "getNextUnbuilt offset " << offset << "\n";
+  // std::cout << "getNextUnbuilt size " << size() << "\n";
+  offset = offset % unbuiltCells;
+  size_t index = 0;
+  for (; offset > 0; ++index){
+    // std::cout << index << ":" << offset << "\n";
+    if ((data[index] & 0x10) == 0) offset -= 1;
+    if (index >= size()) index = 0;
+  }
+  if (index >= size()) index = 0;
+  // std::cout << "getNextUnbuilt index " << index << "\n";
+  // std::cout << "getNextUnbuilt data " << data[index] << "\n";
+  for (;; ++index){
+    if ((data[index] & 0x10) == 0) break;
+    if (index >= size()) index = 0;
+  }
+  // std::cout << "getNextUnbuilt index " << index << "\n";
+  return index;
 }

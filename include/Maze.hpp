@@ -40,4 +40,5 @@ private:
   int width_;
   int height_;
   std::vector<Cell> cells_;
+  int unbuiltCells;
 };

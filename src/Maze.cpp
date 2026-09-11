@@ -62,7 +62,6 @@ void Maze::printMazeToConsole()
   SetConsoleOutputCP(CP_UTF8);
   for (int i = 0; i < width_ * height_; ++i){
     std::cout << (cells_[i] == Cell::Wall ? "█" : (cells_[i] == Cell::Empty ? " " : "X"));
-    //std::cout << (cells_[i] == Cell::Wall ? "1" : "0");
     if ((i + 1) % width_ == 0) std::cout << std::endl;
   }
 }
