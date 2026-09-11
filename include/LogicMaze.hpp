@@ -23,4 +23,6 @@ public:
 
   [[nodiscard]]
   size_t size() const noexcept;
+
+  void printHexes() const;
 };
