@@ -27,6 +27,7 @@ Maze::Maze(int width, int height, LogicMaze& logicMaze)
     if (data & 0x04) set(cellX - 1, cellY, Cell::Empty);
     if (data & 0x08) set(cellX, cellY - 1, Cell::Empty);
     if (data & 0x10) set(cellX, cellY, Cell::Empty);
+    if (data & 0x20) set(cellX, cellY, Cell::Start);
   }
 }
 
@@ -60,7 +61,7 @@ void Maze::printMazeToConsole()
 {
   SetConsoleOutputCP(CP_UTF8);
   for (int i = 0; i < width_ * height_; ++i){
-    std::cout << (cells_[i] == Cell::Wall ? "█" : " ");
+    std::cout << (cells_[i] == Cell::Wall ? "█" : (cells_[i] == Cell::Empty ? " " : "X"));
     //std::cout << (cells_[i] == Cell::Wall ? "1" : "0");
     if ((i + 1) % width_ == 0) std::cout << std::endl;
   }

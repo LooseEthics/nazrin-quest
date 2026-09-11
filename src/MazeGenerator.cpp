@@ -10,7 +10,6 @@ MazeGenerator::MazeGenerator(std::uint32_t seed)
 
 bool isValidLogicDir(size_t cellIndex, uint8_t dir, size_t logicWidth, size_t logicHeight)
 {
-  std::cout << "isvaliddir: " << (int)dir << "\n";
   switch(dir){
     case 0:
       // east
@@ -57,7 +56,7 @@ void MazeGenerator::LERW(size_t branchStart, size_t maxLength)
   branch_.push_back(branchStart);
   std::cout << "LERW\n";
   size_t index, nextIndex = -1;
-  uint8_t dir = -1;
+  uint8_t dir;
   while (
     ((nextIndex != -1) && (logicMaze_.data[nextIndex] & 0x10 == 0))
     || ((maxLength > 0) && (branch_.size() < maxLength))
@@ -65,18 +64,22 @@ void MazeGenerator::LERW(size_t branchStart, size_t maxLength)
     std::cout << "branch: ";
     for (int i : branch_) std::cout << i << ", ";
     std::cout << "\n";
+
     index = branch_.back();
+    dir = -1;
     while (!isValidLogicDir(index, dir, logicMaze_.width, logicMaze_.height))
       dir = dirDistribution_(rng_);
     std::cout << "dir: " << (int)dir << "\n";
+
     nextIndex = getNeightbourLogicCell(index, dir, logicMaze_.width);
+    std::cout << "next: " << nextIndex << "\n";
+
     auto it = find(branch_.begin(), branch_.end(), nextIndex);
     if (it == branch_.end()){
       branch_.push_back(nextIndex);
       dirVector_.push_back(dir);
-    }
-    else {
-      size_t dist = distance(branch_.begin(), it);
+    } else {
+      size_t dist = distance(branch_.begin(), it) + 1;
       branch_.resize(dist);
       dirVector_.resize(dist - 1);
     }
@@ -107,7 +110,7 @@ void MazeGenerator::insertBranch()
 
   // last cell
   index = branch_.back();
-  logicMaze_.data[index] |= 0x10 || (0x1 << dir);
+  logicMaze_.data[index] |= (0x10 | (0x1 << dir));
 }
 
 Maze MazeGenerator::generate(int width, int height)

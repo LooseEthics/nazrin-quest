@@ -11,7 +11,8 @@ const int MAZE_MIN_SIZE = 3;
 enum class Cell : std::uint8_t
 {
   Wall,
-  Empty
+  Empty,
+  Start
 };
 
 class Maze

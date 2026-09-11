@@ -5,6 +5,6 @@
 int main()
 {
   MazeGenerator mg{69420};
-  Maze maze = mg.generate(15, 15);
+  Maze maze = mg.generate(25, 25);
   return 0;
 }
