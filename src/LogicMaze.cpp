@@ -48,13 +48,13 @@ size_t LogicMaze::getNextUnbuilt(size_t offset) const noexcept
   for (; offset > 0; ++index){
     // std::cout << index << ":" << offset << "\n";
     if (index >= size()) index = 0;
-    if ((data[index] & 0x10) == 0) offset -= 1;
+    if ((data[index] & C_BUILT) == 0) offset -= 1;
   }
   // std::cout << "getNextUnbuilt index " << index << "\n";
   // std::cout << "getNextUnbuilt data " << data[index] << "\n";
   for (;; ++index){
     if (index >= size()) index = 0;
-    if ((data[index] & 0x10) == 0) break;
+    if ((data[index] & C_BUILT) == 0) break;
   }
   // std::cout << "getNextUnbuilt index " << index << "\n";
   return index;

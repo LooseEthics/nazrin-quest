@@ -22,12 +22,12 @@ Maze::Maze(int width, int height, const LogicMaze& logicMaze)
     size_t cellX = logicX * 2 + 1;
     size_t cellY = logicY * 2 + 1;
     uint8_t data = logicMaze.data[i];
-    if (data & 0x01) set(cellX + 1, cellY, Cell::Empty);
-    if (data & 0x02) set(cellX, cellY + 1, Cell::Empty);
-    if (data & 0x04) set(cellX - 1, cellY, Cell::Empty);
-    if (data & 0x08) set(cellX, cellY - 1, Cell::Empty);
-    if (data & 0x10) set(cellX, cellY, Cell::Empty);
-    if (data & 0x20) set(cellX, cellY, Cell::Start);
+    if (data & D_EAST ) set(cellX + 1, cellY, Cell::Empty);
+    if (data & D_SOUTH) set(cellX, cellY + 1, Cell::Empty);
+    if (data & D_WEST ) set(cellX - 1, cellY, Cell::Empty);
+    if (data & D_NORTH) set(cellX, cellY - 1, Cell::Empty);
+    if (data & C_BUILT) set(cellX, cellY, Cell::Empty);
+    if (data & C_START) set(cellX, cellY, Cell::Start);
   }
 }
 

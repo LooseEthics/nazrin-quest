@@ -55,12 +55,12 @@ void MazeGenerator::LERW(size_t branchStart, size_t maxLength)
 {
   branch_.push_back(branchStart);
   // std::cout << "LERW " << branchStart << " " << maxLength << "\n";
-  // std::cout << (int)logicMaze_.data[branchStart] << " " << (logicMaze_.data[branchStart] & 0x10) << "\n";
+  // std::cout << (int)logicMaze_.data[branchStart] << " " << (logicMaze_.data[branchStart] & C_BUILT) << "\n";
   size_t index = branchStart, nextIndex = branchStart;
   uint8_t dir;
   while (
     (index == branchStart && nextIndex == branchStart)
-    || ((logicMaze_.data[nextIndex] & 0x10) == 0)
+    || ((logicMaze_.data[nextIndex] & C_BUILT) == 0)
     && (((maxLength > 0) && (branch_.size() < maxLength)) || (maxLength == 0))
   ){
     // std::cout << "branch: ";
@@ -86,14 +86,14 @@ void MazeGenerator::LERW(size_t branchStart, size_t maxLength)
       dirVector_.resize(dist - 1);
     }
     // std::cout << (index == branchStart) << " " <<
-    //   ((logicMaze_.data[index] & 0x10) == 0) << " " <<
+    //   ((logicMaze_.data[index] & C_BUILT) == 0) << " " <<
     //   ((maxLength > 0) && (branch_.size() < maxLength)) << std::endl;
   }
   // std::cout << "branch: ";
   // for (int i : branch_) std::cout << i << ", ";
   // std::cout << "\n";
   // std::cout << (index == branchStart) << " " <<
-  //   ((logicMaze_.data[index] & 0x10) == 0) << " " <<
+  //   ((logicMaze_.data[index] & C_BUILT) == 0) << " " <<
   //   ((maxLength > 0) && (branch_.size() < maxLength)) << std::endl;
 }
 
@@ -104,16 +104,16 @@ void MazeGenerator::insertBranch()
   for (int i = 0; i < branch_.size() - 1; ++i){
     index = branch_[i];
 
-    logicMaze_.data[index] |= 0x10; // cell built
+    logicMaze_.data[index] |= C_BUILT; // cell built
 
     // entry direction
     if (i != 0){
-      logicMaze_.data[index] |= (0x1 << dir);
+      logicMaze_.data[index] |= (D_EAST << dir);
     }
 
     // exit direction
     dir = dirVector_[i];
-    logicMaze_.data[index] |= (0x1 << dir);
+    logicMaze_.data[index] |= (D_EAST << dir);
 
     // reverse exit direction for next cell
     dir = (dir + 2) % 4;
@@ -121,7 +121,7 @@ void MazeGenerator::insertBranch()
 
   // last cell
   index = branch_.back();
-  logicMaze_.data[index] |= (0x10 | (0x1 << dir));
+  logicMaze_.data[index] |= (C_BUILT | (D_EAST << dir));
 
   logicMaze_.unbuiltCells -= branch_.size() - 1;
 }
@@ -151,7 +151,7 @@ Maze MazeGenerator::generate(int width, int height)
 
   LERW(startIndex, initialBranchLength);
 
-  logicMaze_.data[startIndex] |= 0x20;
+  logicMaze_.data[startIndex] |= C_START;
   logicMaze_.unbuiltCells -= 1;
   insertBranch();
 
