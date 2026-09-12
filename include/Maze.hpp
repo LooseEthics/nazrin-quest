@@ -34,7 +34,7 @@ public:
   [[nodiscard]]
   int height() const noexcept;
 
-  void printMazeToConsole();
+  void printMazeToConsole() const;
 
 private:
   int width_;

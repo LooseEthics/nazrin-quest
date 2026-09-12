@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include <cstdint>
 #include <random>
 #include <vector>
@@ -19,7 +21,7 @@ private:
 
   LogicMaze logicMaze_;
   std::vector<size_t> branch_;
-  std::vector<uint8_t> dirVector_;
+  std::vector<Direction> dirVector_;
 
   std::uniform_int_distribution<size_t> cellDistribution_;
   std::uniform_int_distribution<uint8_t> dirDistribution_{0, 3};

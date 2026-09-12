@@ -1,4 +1,5 @@
 
+#include <cassert>
 #include <iostream>
 #include <windows.h>
 
@@ -39,11 +40,13 @@ bool Maze::isInside(int x, int y) const
 
 Cell Maze::get(int x, int y) const
 {
+  assert(isInside(x, y));
   return cells_[x + y * width_];
 }
 
 void Maze::set(int x, int y, Cell cell)
 {
+  assert(isInside(x, y));
   cells_[x + y * width_] = cell;
 }
 
@@ -57,7 +60,7 @@ int Maze::height() const noexcept
   return height_;
 }
 
-void Maze::printMazeToConsole()
+void Maze::printMazeToConsole() const
 {
   SetConsoleOutputCP(CP_UTF8);
   for (int i = 0; i < width_ * height_; ++i){

@@ -1,5 +1,6 @@
 
 #include <algorithm>
+#include <cassert>
 #include <iostream>
 
 #include "MazeGenerator.hpp"
@@ -8,20 +9,16 @@ MazeGenerator::MazeGenerator(std::uint32_t seed)
   : rng_(std::mt19937{seed})
 {}
 
-bool isValidLogicDir(size_t cellIndex, uint8_t dir, size_t logicWidth, size_t logicHeight)
+bool isValidLogicDir(size_t cellIndex, Direction dir, size_t logicWidth, size_t logicHeight)
 {
   switch(dir){
-    case 0:
-      // east
+    case Direction::East:
       return ((cellIndex + 1) % logicWidth != 0);
-    case 1:
-      // south
+    case Direction::South:
       return (cellIndex < logicWidth * (logicHeight - 1));
-    case 2:
-      // west
+    case Direction::West:
       return ((cellIndex % logicWidth) != 0);
-    case 3:
-      // north
+    case Direction::North:
       return (cellIndex >= logicWidth);
     default:
       // invalid direction
@@ -29,24 +26,20 @@ bool isValidLogicDir(size_t cellIndex, uint8_t dir, size_t logicWidth, size_t lo
   }
 }
 
-size_t getNeighbourLogicCell(size_t cellIndex, uint8_t dir, size_t logicWidth)
+size_t getNeighbourLogicCell(size_t cellIndex, Direction dir, size_t logicWidth)
 {
   // assumes direction is valid
+  assert(dir != Direction::Invalid);
   switch(dir){
-    case 0:
-      // east
+    case Direction::East:
       return cellIndex + 1;
-    case 1:
-      // south
+    case Direction::South:
       return cellIndex + logicWidth;
-    case 2:
-      // west
+    case Direction::West:
       return cellIndex - 1;
-    case 3:
-      // north
+    case Direction::North:
       return cellIndex - logicWidth;
     default:
-      // invalid direction
       return -1;
   }
 }
@@ -57,7 +50,7 @@ void MazeGenerator::LERW(size_t branchStart, size_t maxLength)
   // std::cout << "LERW " << branchStart << " " << maxLength << "\n";
   // std::cout << (int)logicMaze_.data[branchStart] << " " << (logicMaze_.data[branchStart] & C_BUILT) << "\n";
   size_t index = branchStart, nextIndex = branchStart;
-  uint8_t dir;
+  Direction dir;
   while (
     (index == branchStart && nextIndex == branchStart)
     || ((logicMaze_.data[nextIndex] & C_BUILT) == 0)
@@ -68,9 +61,9 @@ void MazeGenerator::LERW(size_t branchStart, size_t maxLength)
     // std::cout << "\nlen: " << branch_.size() << "\n";
 
     index = branch_.back();
-    dir = -1;
+    dir = Direction::Invalid;
     while (!isValidLogicDir(index, dir, logicMaze_.width, logicMaze_.height))
-      dir = dirDistribution_(rng_);
+      dir = static_cast<Direction>(dirDistribution_(rng_));
     // std::cout << "dir: " << (int)dir << "\n";
 
     nextIndex = getNeighbourLogicCell(index, dir, logicMaze_.width);
@@ -100,28 +93,28 @@ void MazeGenerator::LERW(size_t branchStart, size_t maxLength)
 void MazeGenerator::insertBranch()
 {
   size_t index;
-  uint8_t dir;
-  for (int i = 0; i < branch_.size() - 1; ++i){
+  Direction dir = dirVector_[0];
+  for (int i = 0; i + 1 < branch_.size(); ++i){
     index = branch_[i];
 
     logicMaze_.data[index] |= C_BUILT; // cell built
 
     // entry direction
     if (i != 0){
-      logicMaze_.data[index] |= (D_EAST << dir);
+      logicMaze_.data[index] |= directionMask(dir);
     }
 
     // exit direction
     dir = dirVector_[i];
-    logicMaze_.data[index] |= (D_EAST << dir);
+    logicMaze_.data[index] |= directionMask(dir);
 
     // reverse exit direction for next cell
-    dir = (dir + 2) % 4;
+    dir = opposite(dir);
   }
 
   // last cell
   index = branch_.back();
-  logicMaze_.data[index] |= (C_BUILT | (D_EAST << dir));
+  logicMaze_.data[index] |= (C_BUILT | directionMask(dir));
 
   logicMaze_.unbuiltCells -= branch_.size() - 1;
 }
