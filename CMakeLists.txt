@@ -14,6 +14,7 @@ set(SOURCES
   src/Maze.cpp
   src/MazeGenerator.cpp
   src/LogicMaze.cpp
+  src/MazeMeshBuilder.cpp
 )
 
 add_executable(nazrin-quest ${SOURCES})

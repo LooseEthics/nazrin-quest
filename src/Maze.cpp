@@ -44,6 +44,14 @@ Cell Maze::get(int x, int y) const
   return cells_[x + y * width_];
 }
 
+Cell Maze::getNeighbour(int x, int y, Direction dir) const
+{
+  int nX = (dir == Direction::East) ? x + 1 : ((dir == Direction::West) ? x - 1 : x);
+  int nY = (dir == Direction::South) ? y + 1 : ((dir == Direction::North) ? y - 1 : y);
+  if (!isInside(nX, nY)) return Cell::Empty;
+  return get(nX, nY);
+}
+
 void Maze::set(int x, int y, Cell cell)
 {
   assert(isInside(x, y));

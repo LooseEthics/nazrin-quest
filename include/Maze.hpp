@@ -27,6 +27,9 @@ public:
   [[nodiscard]]
   Cell get(int x, int y) const;
 
+  [[nodiscard]]
+  Cell getNeighbour(int x, int y, Direction dir) const;
+
   void set(int x, int y, Cell cell);
 
   [[nodiscard]]
