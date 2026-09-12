@@ -9,9 +9,9 @@ constexpr uint8_t D_SOUTH = 0x02;
 constexpr uint8_t D_WEST  = 0x04;
 constexpr uint8_t D_NORTH = 0x08;
 
-constexpr uint8_t C_BUILT = 0x01;
-constexpr uint8_t C_START = 0x01;
-constexpr uint8_t C_GOAL = 0x01;
+constexpr uint8_t C_BUILT = 0x10;
+constexpr uint8_t C_START = 0x20;
+constexpr uint8_t C_GOAL = 0x40;
 
 class LogicMaze
 {
