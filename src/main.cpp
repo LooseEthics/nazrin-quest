@@ -14,7 +14,7 @@ int main()
   MazeMeshBuilder meshBuilder;
   Mesh mesh = meshBuilder.build(maze);
 
-  Renderer renderer{1280, 720};
+  Renderer renderer{1280, 720, mesh.startX, mesh.startZ};
   bool running = true;
 
   while (running) {
@@ -24,6 +24,8 @@ int main()
     while (SDL_PollEvent(&event)){
       if (event.type == SDL_EVENT_QUIT) running = false;
     }
+
+    renderer.camera().rotate(0.01, 0);
 
     renderer.clear();
     renderer.draw(mesh);

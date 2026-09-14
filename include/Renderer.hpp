@@ -5,12 +5,18 @@
 #include <glm/mat4x4.hpp>
 #include <SDL3/SDL.h>
 
+#include "Camera.hpp"
 #include "Mesh.hpp"
 
 class Renderer
 {
 public:
-  Renderer(int width, int height);
+  Renderer(
+    int width,
+    int height,
+    float cameraStartX,
+    float cameraStartZ
+  );
   ~Renderer();
 
   Renderer(const Renderer&) = delete;
@@ -22,6 +28,8 @@ public:
 
   [[nodiscard]]
   SDL_Window* window() const;
+
+  Camera& camera();
 
 private:
   SDL_Window* window_;
@@ -41,4 +49,6 @@ private:
   ) const;
 
   uint32_t createShaderProgram() const;
+
+  Camera camera_;
 };

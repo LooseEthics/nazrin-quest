@@ -4,10 +4,6 @@
 #include "Maze.hpp"
 #include "Mesh.hpp"
 
-constexpr float CELL_SIZE = 1.0f;
-constexpr float WALL_HEIGHT = 2.5f;
-constexpr float FLOOR = 0.0f;
-
 // ccw from visible side
 //     4------5
 //   7-+-----6|

@@ -7,6 +7,8 @@
 Mesh MazeMeshBuilder::build(const Maze& maze) const
 {
   Mesh mesh;
+  mesh.startX = (static_cast<float>(maze.getStart().x) + 0.5) * CELL_SIZE;
+  mesh.startZ = (static_cast<float>(maze.getStart().y) + 0.5) * CELL_SIZE;
 
   for (int z = 0; z < maze.height(); ++z){
     for (int x = 0; x < maze.width(); ++x){

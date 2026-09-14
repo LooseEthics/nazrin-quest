@@ -35,13 +35,14 @@ void main(){
 
 }
 
-Renderer::Renderer(int width, int height)
+Renderer::Renderer(int width, int height, float cameraStartX, float cameraStartZ)
   : window_(nullptr),
     context_(nullptr),
     vertexArray_(0),
     vertexBuffer_(0),
     indexBuffer_(0),
-    shaderProgram_(0)
+    shaderProgram_(0),
+    camera_(cameraStartX, 1.0f, cameraStartZ, -glm::half_pi<float>(), 0.0f)
 {
   if (!SDL_Init(SDL_INIT_VIDEO)) throw std::runtime_error(SDL_GetError());
 
@@ -72,16 +73,10 @@ Renderer::Renderer(int width, int height)
   shaderProgram_ = createShaderProgram();
 
   projection_ = glm::perspective(
-    glm::radians(70.0f),
+    glm::radians(80.0f),
     static_cast<float>(width) / static_cast<float>(height),
     0.1f,
     500.0f
-  );
-
-  view_ = glm::lookAt(
-    glm::vec3(105.0f, 150.0f, 250.0f),
-    glm::vec3(105.0f, 0.0f, 105.0f),
-    glm::vec3(0.0f, 1.0f, 0.0f)
   );
 }
 
@@ -119,6 +114,8 @@ void Renderer::draw(const Mesh& mesh) const
 {
   glUseProgram(shaderProgram_);
 
+  const glm::mat4 view = camera_.viewMatrix();
+
   const GLint projectionLocation = glGetUniformLocation(shaderProgram_, "projection");
   const GLint viewLocation = glGetUniformLocation(shaderProgram_, "view");
 
@@ -133,7 +130,7 @@ void Renderer::draw(const Mesh& mesh) const
     viewLocation,
     1,
     GL_FALSE,
-    glm::value_ptr(view_)
+    glm::value_ptr(view)
   );
 
   glBindVertexArray(vertexArray_);
@@ -186,6 +183,11 @@ void Renderer::draw(const Mesh& mesh) const
 SDL_Window* Renderer::window() const
 {
   return window_;
+}
+
+Camera& Renderer::camera()
+{
+  return camera_;
 }
 
 uint32_t Renderer::compileShader(

@@ -50,6 +50,7 @@ set(SOURCES
   src/LogicMaze.cpp
   src/MazeMeshBuilder.cpp
   src/Renderer.cpp
+  src/Camera.cpp
 )
 
 add_executable(nazrin-quest ${SOURCES})
