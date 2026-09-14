@@ -1,4 +1,5 @@
 
+#include <iostream>
 #include <stdexcept>
 
 #include "MazeMeshBuilder.hpp"
@@ -36,6 +37,8 @@ Mesh MazeMeshBuilder::build(const Maze& maze) const
       }
     }
   }
+  std::cout << "Vertices: " << mesh.vertices.size() << "\n";
+  std::cout << "Indices: " << mesh.indices.size() << "\n";
   return mesh;
 }
 

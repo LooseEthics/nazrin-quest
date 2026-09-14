@@ -2,6 +2,7 @@
 #pragma once
 
 #include <cstdint>
+#include <glm/mat4x4.hpp>
 #include <SDL3/SDL.h>
 
 #include "Mesh.hpp"
@@ -20,7 +21,7 @@ public:
   void present() const;
 
   [[nodiscard]]
-  SDL_Window* window();
+  SDL_Window* window() const;
 
 private:
   SDL_Window* window_;
@@ -31,6 +32,13 @@ private:
   uint32_t indexBuffer_;
   uint32_t shaderProgram_;
 
-  int width_;
-  int height_;
+  glm::mat4 projection_;
+  glm::mat4 view_;
+
+  uint32_t compileShader(
+    uint32_t type,
+    const char* source
+  ) const;
+
+  uint32_t createShaderProgram() const;
 };

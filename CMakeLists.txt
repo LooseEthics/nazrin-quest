@@ -35,6 +35,14 @@ glad_add_library(
   API gl:core=3.3
 )
 
+FetchContent_Declare(
+  glm
+  GIT_REPOSITORY https://github.com/g-truc/glm.git
+  GIT_TAG 1.0.1
+)
+
+FetchContent_MakeAvailable(glm)
+
 set(SOURCES
   src/main.cpp
   src/Maze.cpp
@@ -55,6 +63,7 @@ target_link_libraries(nazrin-quest
   PRIVATE
   SDL3::SDL3
   glad_gl_core_33
+  glm::glm
 )
 
 if(WIN32)
