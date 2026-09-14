@@ -94,7 +94,7 @@ void MazeGenerator::insertBranch()
 {
   size_t index;
   Direction dir = dirVector_[0];
-  for (int i = 0; i + 1 < branch_.size(); ++i){
+  for (size_t i = 0; i + 1 < branch_.size(); ++i){
     index = branch_[i];
 
     logicMaze_.data[index] |= C_BUILT; // cell built

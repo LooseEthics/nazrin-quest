@@ -39,10 +39,22 @@ void Camera::moveRight(float distance)
   pos_ += glm::vec3{forward.z, 0.0f, -forward.x} * distance;
 }
 
-void Camera::rotate(float dYaw, float dPitch)
+void Camera::rotate(float dYaw, float dPitch, bool pitchClamp)
 {
   yaw_ += dYaw;
-  pitch_ += dPitch;
+  if (pitchClamp)
+    pitch_ += dPitch;
+  else
+    pitch = std::clamp(
+      pitch_ + dPitch,
+      -maxPitch,
+      maxPitch
+    );
+}
+
+void Camera::rotate(float dYaw, float dPitch)
+{
+  rotate(dYaw, dPitch, true);
 }
 
 glm::vec3 Camera::forwardVector() const

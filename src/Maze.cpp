@@ -3,6 +3,7 @@
 #include <iostream>
 #include <windows.h>
 
+#include "CommonGeometry.hpp"
 #include "Maze.hpp"
 
 Maze::Maze(int width, int height)
@@ -100,4 +101,13 @@ Maze::Coord Maze::getStart() const
 Maze::Coord Maze::getGoal() const
 {
   return goal_;
+}
+
+Maze::vec3f Maze::getStartCamera() const
+{
+  return {
+    static_cast<float>((static_cast<float>(start_.x) + 0.5) * CELL_SIZE),
+    0.0f,
+    static_cast<float>((static_cast<float>(start_.y) + 0.5) * CELL_SIZE)
+  };
 }

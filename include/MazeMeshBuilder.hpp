@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "CommonGeometry.hpp"
 #include "Maze.hpp"
 #include "Mesh.hpp"
 

@@ -1,4 +1,5 @@
 
+#include <array>
 #include <iostream>
 #include <stdexcept>
 
@@ -7,15 +8,13 @@
 Mesh MazeMeshBuilder::build(const Maze& maze) const
 {
   Mesh mesh;
-  mesh.startX = (static_cast<float>(maze.getStart().x) + 0.5) * CELL_SIZE;
-  mesh.startZ = (static_cast<float>(maze.getStart().y) + 0.5) * CELL_SIZE;
 
   for (int z = 0; z < maze.height(); ++z){
     for (int x = 0; x < maze.width(); ++x){
       if (maze.get(x, z) != Cell::Wall) continue;
 
       const uint32_t baseIndex = static_cast<uint32_t>(mesh.vertices.size());
-      std::vector<Vertex> cellVertices{
+      const std::array<Vertex, 8> cellVertices = {{
         {x * CELL_SIZE      , FLOOR              , z * CELL_SIZE      },
         {(x + 1) * CELL_SIZE, FLOOR              , z * CELL_SIZE      },
         {(x + 1) * CELL_SIZE, FLOOR              , (z + 1) * CELL_SIZE},
@@ -24,7 +23,7 @@ Mesh MazeMeshBuilder::build(const Maze& maze) const
         {(x + 1) * CELL_SIZE, FLOOR + WALL_HEIGHT, z * CELL_SIZE      },
         {(x + 1) * CELL_SIZE, FLOOR + WALL_HEIGHT, (z + 1) * CELL_SIZE},
         {x * CELL_SIZE      , FLOOR + WALL_HEIGHT, (z + 1) * CELL_SIZE}
-      };
+      }};
 
       mesh.vertices.insert(
         mesh.vertices.end(),

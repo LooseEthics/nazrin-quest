@@ -56,10 +56,18 @@ public:
     return {i % width_, i / width_};
   }
 
+  struct vec3f
+  {
+    float x;
+    float y;
+    float z;
+  };
+
   void setStart(int x, int y);
   void setGoal(int x, int y);
   Coord getStart() const;
   Coord getGoal() const;
+  vec3f getStartCamera() const;
 
 private:
   int width_;

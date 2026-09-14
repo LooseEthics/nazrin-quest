@@ -13,8 +13,9 @@ int main()
 
   MazeMeshBuilder meshBuilder;
   Mesh mesh = meshBuilder.build(maze);
+  Maze::vec3f cameraStartCoords = maze.getStartCamera();
 
-  Renderer renderer{1280, 720, mesh.startX, mesh.startZ};
+  Renderer renderer{1280, 720, cameraStartCoords.x, cameraStartCoords.z};
   bool running = true;
 
   while (running) {

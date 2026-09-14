@@ -12,6 +12,7 @@ constexpr uint8_t C_GOAL = 0x40;
 
 enum class Direction : uint8_t
 {
+  // do not change the order of cardinal directions!!
   East = 0,
   South = 1,
   West = 2,
