@@ -11,8 +11,7 @@ constexpr int MAZE_MIN_SIZE = 3;
 enum class Cell : std::uint8_t
 {
   Wall,
-  Empty,
-  Start
+  Empty
 };
 
 class Maze
@@ -39,8 +38,34 @@ public:
 
   void printMazeToConsole() const;
 
+  struct Coord
+  {
+    int x;
+    int y;
+
+    bool operator==(const Coord&) const = default;
+  };
+
+  constexpr int xy2index(int x, int y) const
+  {
+    return y * width_ + x;
+  }
+
+  constexpr Coord index2coord(int i) const
+  {
+    return {i % width_, i / width_};
+  }
+
+  void setStart(int x, int y);
+  void setGoal(int x, int y);
+  Coord getStart() const;
+  Coord getGoal() const;
+
 private:
   int width_;
   int height_;
   std::vector<Cell> cells_;
+
+  Coord start_;
+  Coord goal_;
 };

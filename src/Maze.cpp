@@ -28,7 +28,8 @@ Maze::Maze(int width, int height, const LogicMaze& logicMaze)
     if (data & D_WEST ) set(cellX - 1, cellY, Cell::Empty);
     if (data & D_NORTH) set(cellX, cellY - 1, Cell::Empty);
     if (data & C_BUILT) set(cellX, cellY, Cell::Empty);
-    if (data & C_START) set(cellX, cellY, Cell::Start);
+    if (data & C_START) setStart(cellX, cellY);
+    if (data & C_GOAL) setGoal(cellX, cellY);
   }
 }
 
@@ -72,7 +73,31 @@ void Maze::printMazeToConsole() const
 {
   SetConsoleOutputCP(CP_UTF8);
   for (int i = 0; i < width_ * height_; ++i){
-    std::cout << (cells_[i] == Cell::Wall ? "█" : (cells_[i] == Cell::Empty ? " " : "X"));
+    if (index2coord(i) == start_) std::cout << "X";
+    else std::cout << (cells_[i] == Cell::Wall ? "█" : " ");
+
     if ((i + 1) % width_ == 0) std::cout << std::endl;
   }
+}
+
+void Maze::setStart(int x, int y)
+{
+  assert(isInside(x, y));
+  start_ = {x, y};
+}
+
+void Maze::setGoal(int x, int y)
+{
+  assert(isInside(x, y));
+  goal_ = {x, y};
+}
+
+Maze::Coord Maze::getStart() const
+{
+  return start_;
+}
+
+Maze::Coord Maze::getGoal() const
+{
+  return goal_;
 }
