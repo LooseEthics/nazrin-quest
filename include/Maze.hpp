@@ -8,7 +8,7 @@
 #include "CommonGeometry.hpp"
 #include "LogicMaze.hpp"
 
-constexpr int MAZE_MIN_SIZE = 3;
+constexpr int MAZE_MIN_SIZE = 5;
 
 enum class Cell : std::uint8_t
 {
