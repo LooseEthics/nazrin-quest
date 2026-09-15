@@ -42,10 +42,11 @@ void Input::processEvent(const SDL_Event& event)
       break;
 
     case SDL_EVENT_MOUSE_BUTTON_DOWN:
-      if (event.button.button == SDL_BUTTON_LEFT)
+      if (event.button.button == SDL_BUTTON_LEFT){
         mouseCaptured_ = true;
         mouseDeltaX_ = 0.0f;
         mouseDeltaY_ = 0.0f;
+      }
       break;
   }
 }

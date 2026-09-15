@@ -135,12 +135,12 @@ Maze MazeGenerator::generate(int width, int height)
   if (width < MAZE_MIN_SIZE || height < MAZE_MIN_SIZE){
     std::cerr << "Maze dimensions must be >= " << MAZE_MIN_SIZE << ".\n";
     std::cerr << "Got (" << width << ", " << height << ").\n";
-    return Maze(MAZE_MIN_SIZE, MAZE_MIN_SIZE);
+    throw std::invalid_argument("Invalid maze dimensions");
   }
   if (width % 2 == 0 || height % 2 == 0){
     std::cerr << "Maze dimensions must be odd-valued.\n";
     std::cerr << "Got (" << width << ", " << height << ").\n";
-    return Maze(MAZE_MIN_SIZE, MAZE_MIN_SIZE);
+    throw std::invalid_argument("Invalid maze dimensions");
   }
 
   logicMaze_ = LogicMaze{

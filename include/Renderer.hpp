@@ -42,7 +42,6 @@ private:
   uint32_t shaderProgram_;
 
   glm::mat4 projection_;
-  glm::mat4 view_;
 
   uint32_t compileShader(
     uint32_t type,

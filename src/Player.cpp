@@ -1,4 +1,5 @@
 
+#include <cmath>
 #include <glm/gtc/constants.hpp>
 #include <iostream>
 

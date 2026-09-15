@@ -121,6 +121,8 @@ void Renderer::draw(
   const glm::vec3& color
 ) const
 {
+  // TODO: only upload maze meshes once, not every frame
+  // TODO: also link only once
   glUseProgram(shaderProgram_);
 
   const glm::mat4 view = camera_.viewMatrix();
