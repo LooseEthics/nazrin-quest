@@ -2,6 +2,7 @@
 #pragma once
 
 #include <cstdint>
+#include <glm/glm.hpp>
 #include <vector>
 
 #include "CommonGeometry.hpp"
@@ -61,7 +62,7 @@ public:
   void setGoal(int x, int y);
   Coord getStart() const;
   Coord getGoal() const;
-  vec3f getStartCoords() const;
+  glm::vec3 getStartCoords() const;
 
 private:
   int width_;

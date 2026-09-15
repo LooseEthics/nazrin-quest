@@ -7,24 +7,16 @@ class Camera
 {
 public:
   Camera(
-    float x,
-    float y,
-    float z,
+    glm::vec3 pos,
     float yaw,
     float pitch
   );
 
   Camera();
 
-  void move(float dx, float dy, float dz);
-  void setPos(float x, float y, float z);
-  void moveForward(float distance);
-  void moveRight(float distance);
-  void rotate(float dYaw, float dPitch, bool pitchClamp);
-  void rotate(float dYaw, float dPitch);
+  void setPos(glm::vec3 pos);
+  void setRot(float yaw, float pitch);
 
-  glm::vec3 forwardVector() const;
-  glm::vec3 flatForwardVector() const;
   glm::mat4 viewMatrix() const;
 
 private:
@@ -33,5 +25,4 @@ private:
   float pitch_;
 
   static constexpr glm::vec3 upVector_{0.0f, 1.0f, 0.0f};
-  static constexpr float maxPitch = glm::radians(89.0f);
 };

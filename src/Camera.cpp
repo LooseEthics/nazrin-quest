@@ -3,83 +3,35 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Camera.hpp"
+#include "CommonGeometry.hpp"
 
 Camera::Camera(
-  float x,
-  float y,
-  float z,
+  glm::vec3 pos,
   float yaw,
   float pitch
-) : pos_({x, y, z}),
+) : pos_(pos),
     yaw_(yaw),
     pitch_(pitch)
 {}
 
-Camera::Camera() : Camera(0, 0, 0, 0, 0) {}
+Camera::Camera() : Camera(glm::vec3{0, 0, 0}, 0, 0) {}
 
-void Camera::move(float dx, float dy, float dz)
+void Camera::setPos(glm::vec3 pos)
 {
-  pos_ += glm::vec3{dx, dy, dz};
+  pos_ = pos;
 }
 
-void Camera::setPos(float x, float y, float z)
+void Camera::setRot(float yaw, float pitch)
 {
-  pos_ = glm::vec3{x, y, z};
-}
-
-void Camera::moveForward(float distance)
-{
-  const glm::vec3 forward = flatForwardVector();
-  pos_ += glm::vec3{forward.x, 0.0f, forward.z} * distance;
-}
-
-void Camera::moveRight(float distance)
-{
-  const glm::vec3 forward = flatForwardVector();
-  pos_ += glm::vec3{forward.z, 0.0f, -forward.x} * distance;
-}
-
-void Camera::rotate(float dYaw, float dPitch, bool pitchClamp)
-{
-  yaw_ += dYaw;
-  if (pitchClamp)
-    pitch_ += dPitch;
-  else
-    pitch_ = glm::clamp(
-      pitch_ + dPitch,
-      -maxPitch,
-      maxPitch
-    );
-}
-
-void Camera::rotate(float dYaw, float dPitch)
-{
-  rotate(dYaw, dPitch, true);
-}
-
-glm::vec3 Camera::forwardVector() const
-{
-  return {
-    std::cos(yaw_) * std::cos(pitch_),
-    std::sin(pitch_),
-    std::sin(yaw_) * std::cos(pitch_)
-  };
-}
-
-glm::vec3 Camera::flatForwardVector() const
-{
-  return {
-    std::cos(yaw_),
-    0.0f,
-    std::sin(yaw_)
-  };
+  yaw_ = yaw;
+  pitch_ = pitch;
 }
 
 glm::mat4 Camera::viewMatrix() const
 {
   return glm::lookAt(
     pos_,
-    pos_ + forwardVector(),
+    pos_ + forwardVector(yaw_, pitch_),
     upVector_
   );
 }

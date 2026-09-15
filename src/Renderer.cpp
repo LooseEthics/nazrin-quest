@@ -60,6 +60,9 @@ Renderer::Renderer(int width, int height, Camera& camera)
   );
   if (!window_) throw std::runtime_error(SDL_GetError());
 
+  if (!SDL_SetWindowRelativeMouseMode(window_, true))
+    throw std::runtime_error(SDL_GetError());
+
   context_ = SDL_GL_CreateContext(window_);
   if (!context_) throw std::runtime_error(SDL_GetError());
 

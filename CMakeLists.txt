@@ -52,6 +52,8 @@ set(SOURCES
   src/Renderer.cpp
   src/Camera.cpp
   src/Player.cpp
+  src/Input.cpp
+  src/CommonGeometry.cpp
 )
 
 add_executable(nazrin-quest ${SOURCES})

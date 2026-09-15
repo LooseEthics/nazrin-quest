@@ -103,7 +103,7 @@ Maze::Coord Maze::getGoal() const
   return goal_;
 }
 
-vec3f Maze::getStartCoords() const
+glm::vec3 Maze::getStartCoords() const
 {
   return {
     static_cast<float>((static_cast<float>(start_.x) + 0.5) * CELL_SIZE),

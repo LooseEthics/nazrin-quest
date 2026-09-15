@@ -19,23 +19,34 @@ int main()
   Player player{maze.getStartCoords()};
 
   Renderer renderer{1280, 720, player.camera()};
-  bool running = true;
 
-  while (running) {
-    //std::cout << "frame\n";
+  Input input;
+  Uint64 previous = SDL_GetTicks();
+
+  while (!input.quitRequested()) {
+    Uint64 current = SDL_GetTicks();
+    float deltaTime = static_cast<float>(current - previous) / 1000.0f;
+    previous = current;
+
     SDL_Event event;
 
     while (SDL_PollEvent(&event)){
-      if (event.type == SDL_EVENT_QUIT) running = false;
+      input.processEvent(event);
     }
 
-    player.camera().rotate(0.01, 0);
+    SDL_SetWindowRelativeMouseMode(renderer.window(), input.mouseCaptured());
+    player.update(input, deltaTime);
 
     renderer.clear();
+
     renderer.draw(meshes.solid, GL_TRIANGLES, {0.5f, 0.5f, 0.5f});
+
     glLineWidth(3.0f);
     renderer.draw(meshes.edges, GL_LINES, {0.9f, 0.0f, 0.0f});
+
     renderer.present();
+
+    input.endFrame();
   }
 
   return 0;
