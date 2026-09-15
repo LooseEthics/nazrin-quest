@@ -16,7 +16,7 @@ int main()
   MazeMeshBuilder meshBuilder;
   MazeMeshes meshes = meshBuilder.build(maze);
 
-  Player player{maze.getStartCoords()};
+  Player player{maze};
 
   Renderer renderer{1280, 720, player.camera()};
 
@@ -24,6 +24,18 @@ int main()
   Uint64 previous = SDL_GetTicks();
 
   while (!input.quitRequested()) {
+    const glm::vec3 pos = player.pos();
+    const float yaw = player.yaw();
+    const float pitch = player.pitch();
+
+    std::string title =
+      "Nazrin Quest | X: " + std::to_string(pos.x) +
+      " Y: " + std::to_string(pos.y) +
+      " Z: " + std::to_string(pos.z) +
+      " Yaw: " + std::to_string(yaw) +
+      " Pitch: " + std::to_string(pitch);
+    SDL_SetWindowTitle(renderer.window(), title.c_str());
+
     Uint64 current = SDL_GetTicks();
     float deltaTime = static_cast<float>(current - previous) / 1000.0f;
     previous = current;

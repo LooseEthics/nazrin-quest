@@ -80,7 +80,7 @@ Renderer::Renderer(int width, int height, Camera& camera)
   projection_ = glm::perspective(
     glm::radians(80.0f),
     static_cast<float>(width) / static_cast<float>(height),
-    0.1f,
+    0.01f,
     500.0f
   );
 }
