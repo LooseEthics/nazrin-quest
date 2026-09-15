@@ -26,23 +26,25 @@ void main()
 constexpr const char* FRAGMENT_SHADER = R"(
 #version 330 core
 
-out vec4 color;
+out vec4 fragmentColor;
+
+uniform vec3 color;
 
 void main(){
-  color = vec4(0.75, 0.75, 0.75, 1.0);
+  fragmentColor = vec4(color, 1.0);
 }
 )";
 
 }
 
-Renderer::Renderer(int width, int height, float cameraStartX, float cameraStartZ)
+Renderer::Renderer(int width, int height, Camera& camera)
   : window_(nullptr),
     context_(nullptr),
     vertexArray_(0),
     vertexBuffer_(0),
     indexBuffer_(0),
     shaderProgram_(0),
-    camera_(cameraStartX, 1.0f, cameraStartZ, -glm::half_pi<float>(), 0.0f)
+    camera_(camera)
 {
   if (!SDL_Init(SDL_INIT_VIDEO)) throw std::runtime_error(SDL_GetError());
 
@@ -110,7 +112,11 @@ void Renderer::present() const
   SDL_GL_SwapWindow(window_);
 }
 
-void Renderer::draw(const Mesh& mesh) const
+void Renderer::draw(
+  const Mesh& mesh,
+  GLenum primitiveType,
+  const glm::vec3& color
+) const
 {
   glUseProgram(shaderProgram_);
 
@@ -118,6 +124,7 @@ void Renderer::draw(const Mesh& mesh) const
 
   const GLint projectionLocation = glGetUniformLocation(shaderProgram_, "projection");
   const GLint viewLocation = glGetUniformLocation(shaderProgram_, "view");
+  const GLint colorLocation = glGetUniformLocation(shaderProgram_, "color");
 
   glUniformMatrix4fv(
     projectionLocation,
@@ -131,6 +138,12 @@ void Renderer::draw(const Mesh& mesh) const
     1,
     GL_FALSE,
     glm::value_ptr(view)
+  );
+
+  glUniform3fv(
+    colorLocation,
+    1,
+    glm::value_ptr(color)
   );
 
   glBindVertexArray(vertexArray_);
@@ -171,7 +184,7 @@ void Renderer::draw(const Mesh& mesh) const
   glEnableVertexAttribArray(0);
 
   glDrawElements(
-    GL_TRIANGLES,
+    primitiveType,
     static_cast<GLsizei>(mesh.indices.size()),
     GL_UNSIGNED_INT,
     nullptr
@@ -183,11 +196,6 @@ void Renderer::draw(const Mesh& mesh) const
 SDL_Window* Renderer::window() const
 {
   return window_;
-}
-
-Camera& Renderer::camera()
-{
-  return camera_;
 }
 
 uint32_t Renderer::compileShader(

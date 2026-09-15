@@ -51,6 +51,7 @@ set(SOURCES
   src/MazeMeshBuilder.cpp
   src/Renderer.cpp
   src/Camera.cpp
+  src/Player.cpp
 )
 
 add_executable(nazrin-quest ${SOURCES})

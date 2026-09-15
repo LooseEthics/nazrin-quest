@@ -45,7 +45,7 @@ void Camera::rotate(float dYaw, float dPitch, bool pitchClamp)
   if (pitchClamp)
     pitch_ += dPitch;
   else
-    pitch = std::clamp(
+    pitch_ = glm::clamp(
       pitch_ + dPitch,
       -maxPitch,
       maxPitch

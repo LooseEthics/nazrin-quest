@@ -1,9 +1,11 @@
 
+#include <glad/gl.h>
 #include <iostream>
 
 #include "Maze.hpp"
 #include "MazeGenerator.hpp"
 #include "MazeMeshBuilder.hpp"
+#include "Player.hpp"
 #include "Renderer.hpp"
 
 int main()
@@ -12,10 +14,11 @@ int main()
   Maze maze = mg.generate(205, 203);
 
   MazeMeshBuilder meshBuilder;
-  Mesh mesh = meshBuilder.build(maze);
-  Maze::vec3f cameraStartCoords = maze.getStartCamera();
+  MazeMeshes meshes = meshBuilder.build(maze);
 
-  Renderer renderer{1280, 720, cameraStartCoords.x, cameraStartCoords.z};
+  Player player{maze.getStartCoords()};
+
+  Renderer renderer{1280, 720, player.camera()};
   bool running = true;
 
   while (running) {
@@ -26,10 +29,12 @@ int main()
       if (event.type == SDL_EVENT_QUIT) running = false;
     }
 
-    renderer.camera().rotate(0.01, 0);
+    player.camera().rotate(0.01, 0);
 
     renderer.clear();
-    renderer.draw(mesh);
+    renderer.draw(meshes.solid, GL_TRIANGLES, {0.5f, 0.5f, 0.5f});
+    glLineWidth(3.0f);
+    renderer.draw(meshes.edges, GL_LINES, {0.9f, 0.0f, 0.0f});
     renderer.present();
   }
 

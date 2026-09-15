@@ -14,8 +14,7 @@ public:
   Renderer(
     int width,
     int height,
-    float cameraStartX,
-    float cameraStartZ
+    Camera& camera
   );
   ~Renderer();
 
@@ -23,13 +22,15 @@ public:
   Renderer& operator=(const Renderer&) = delete;
 
   void clear() const;
-  void draw(const Mesh& mesh) const;
+  void draw(
+    const Mesh& mesh,
+    GLenum primitiveType,
+    const glm::vec3& color
+  ) const;
   void present() const;
 
   [[nodiscard]]
   SDL_Window* window() const;
-
-  Camera& camera();
 
 private:
   SDL_Window* window_;
@@ -50,5 +51,5 @@ private:
 
   uint32_t createShaderProgram() const;
 
-  Camera camera_;
+  Camera& camera_;
 };

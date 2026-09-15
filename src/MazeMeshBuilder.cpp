@@ -5,15 +5,15 @@
 
 #include "MazeMeshBuilder.hpp"
 
-Mesh MazeMeshBuilder::build(const Maze& maze) const
+MazeMeshes MazeMeshBuilder::build(const Maze& maze) const
 {
-  Mesh mesh;
+  MazeMeshes meshes;
 
   for (int z = 0; z < maze.height(); ++z){
     for (int x = 0; x < maze.width(); ++x){
       if (maze.get(x, z) != Cell::Wall) continue;
 
-      const uint32_t baseIndex = static_cast<uint32_t>(mesh.vertices.size());
+      const uint32_t baseIndex = static_cast<uint32_t>(meshes.solid.vertices.size());
       const std::array<Vertex, 8> cellVertices = {{
         {x * CELL_SIZE      , FLOOR              , z * CELL_SIZE      },
         {(x + 1) * CELL_SIZE, FLOOR              , z * CELL_SIZE      },
@@ -25,22 +25,30 @@ Mesh MazeMeshBuilder::build(const Maze& maze) const
         {x * CELL_SIZE      , FLOOR + WALL_HEIGHT, (z + 1) * CELL_SIZE}
       }};
 
-      mesh.vertices.insert(
-        mesh.vertices.end(),
+      meshes.solid.vertices.insert(
+        meshes.solid.vertices.end(),
         cellVertices.begin(),
         cellVertices.end()
       );
 
-      addDirectedQuad(mesh, baseIndex, Direction::Up);
+      meshes.edges.vertices.insert(
+        meshes.edges.vertices.end(),
+        cellVertices.begin(),
+        cellVertices.end()
+      );
+
+      addDirectedQuad(meshes.solid, baseIndex, Direction::Up);
       for (Direction dir : cardinalDirs){
         if (maze.getNeighbour(x, z, dir) != Cell::Wall)
-          addDirectedQuad(mesh, baseIndex, dir);
+          addDirectedQuad(meshes.solid, baseIndex, dir);
       }
+
+      addCubeFrame(meshes.edges, baseIndex, INDEX_OFFSETS_CUBE_EDGES);
     }
   }
-  std::cout << "Vertices: " << mesh.vertices.size() << "\n";
-  std::cout << "Indices: " << mesh.indices.size() << "\n";
-  return mesh;
+  // std::cout << "Vertices: " << mesh.vertices.size() << "\n";
+  // std::cout << "Indices: " << mesh.indices.size() << "\n";
+  return meshes;
 }
 
 void MazeMeshBuilder::addDirectedQuad(
@@ -91,4 +99,14 @@ void MazeMeshBuilder::addQuad(
       baseIndex + offsets[3]
     }
   );
+}
+
+void MazeMeshBuilder::addCubeFrame(
+  Mesh& mesh,
+  uint32_t baseIndex,
+  const int offsets[24]
+) const {
+  for (int i = 0; i < 24; ++i){
+    mesh.indices.push_back(baseIndex + offsets[i]);
+  }
 }
