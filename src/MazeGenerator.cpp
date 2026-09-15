@@ -94,10 +94,15 @@ void MazeGenerator::insertBranch()
 {
   size_t index;
   Direction dir = dirVector_[0];
-  for (size_t i = 0; i + 1 < branch_.size(); ++i){
+  uint32_t endDist = logicMaze_.distanceFromStart[branch_.back()];
+  //std::cout << endDist << "\n";
+  const size_t branchLen = branch_.size();
+  for (size_t i = 0; i + 1 < branchLen; ++i){
     index = branch_[i];
 
     logicMaze_.data[index] |= C_BUILT; // cell built
+    logicMaze_.distanceFromStart[index] = endDist + branchLen - i - 1;
+    //std::cout << index << " " << logicMaze_.distanceFromStart[index] << "\n";
 
     // entry direction
     if (i != 0){
@@ -115,6 +120,12 @@ void MazeGenerator::insertBranch()
   // last cell
   index = branch_.back();
   logicMaze_.data[index] |= (C_BUILT | directionMask(dir));
+  //std::cout << "last " << index << " " << logicMaze_.distanceFromStart[index] << "\n";
+
+  if (logicMaze_.distanceFromStart[branch_[0]] > logicMaze_.longestDistance){
+    logicMaze_.furthestCell = branch_[0];
+    logicMaze_.longestDistance = logicMaze_.distanceFromStart[branch_[0]];
+  }
 
   logicMaze_.unbuiltCells -= branch_.size() - 1;
 }
@@ -142,18 +153,19 @@ Maze MazeGenerator::generate(int width, int height)
   size_t startIndex = cellDistribution_(rng_);
   size_t initialBranchLength = (logicMaze_.width + logicMaze_.height) / 2;
 
-  LERW(startIndex, initialBranchLength);
+  //LERW(startIndex, initialBranchLength);
 
-  logicMaze_.data[startIndex] |= C_START;
+  logicMaze_.data[startIndex] |= C_BUILT | C_START;
+  logicMaze_.distanceFromStart[startIndex] = 0;
   logicMaze_.unbuiltCells -= 1;
-  insertBranch();
-
-  // logicMaze_.printHexes();
-  // Maze maze{width, height, logicMaze_};
-  // maze.printMazeToConsole();
-
-  branch_.clear();
-  dirVector_.clear();
+  // insertBranch();
+  //
+  // // logicMaze_.printHexes();
+  // // Maze maze{width, height, logicMaze_};
+  // // maze.printMazeToConsole();
+  //
+  // branch_.clear();
+  // dirVector_.clear();
 
   // branch from random unbuilt lc until exhausted
   while (logicMaze_.unbuiltCells > 0){
@@ -170,6 +182,8 @@ Maze MazeGenerator::generate(int width, int height)
     // maze = Maze{width, height, logicMaze_};
     // maze.printMazeToConsole();
   }
+
+  logicMaze_.data[logicMaze_.furthestCell] |= C_GOAL;
 
 
   Maze maze{width, height, logicMaze_};

@@ -10,6 +10,7 @@ LogicMaze::LogicMaze(size_t width, size_t height)
     unbuiltCells(width * height)
 {
   data.assign(width * height, 0);
+  distanceFromStart.assign(width * height, 0);
 }
 
 LogicMaze::LogicMaze()

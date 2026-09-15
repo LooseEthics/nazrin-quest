@@ -9,6 +9,7 @@ public:
   void processEvent(const SDL_Event& event);
 
   bool quitRequested() const noexcept;
+  void requestQuit();
 
   bool forward() const noexcept;
   bool backward() const noexcept;

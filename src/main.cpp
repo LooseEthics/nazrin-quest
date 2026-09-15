@@ -11,7 +11,7 @@
 int main()
 {
   MazeGenerator mg{69420};
-  Maze maze = mg.generate(205, 203);
+  Maze maze = mg.generate(9, 9);
 
   MazeMeshBuilder meshBuilder;
   MazeMeshes meshes = meshBuilder.build(maze);
@@ -48,6 +48,11 @@ int main()
 
     SDL_SetWindowRelativeMouseMode(renderer.window(), input.mouseCaptured());
     player.update(input, deltaTime);
+
+    if (player.goalReached()){
+      std::cout << "CONGRASHUNZ!\nYOU ARE WINRAR!\n";
+      input.requestQuit();
+    }
 
     renderer.clear();
 

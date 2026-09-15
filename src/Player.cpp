@@ -87,10 +87,10 @@ void Player::move(float dx, float dz)
 
 void Player::resolveCollision(glm::vec3& position)
 {
-  const int minCellX = static_cast<int>(std::floor(position.x - collisionRadius));
-  const int maxCellX = static_cast<int>(std::floor(position.x + collisionRadius));
-  const int minCellZ = static_cast<int>(std::floor(position.z- collisionRadius));
-  const int maxCellZ = static_cast<int>(std::floor(position.z + collisionRadius));
+  const int minCellX = static_cast<int>(std::floor((position.x - collisionRadius) / CELL_SIZE));
+  const int maxCellX = static_cast<int>(std::floor((position.x + collisionRadius) / CELL_SIZE));
+  const int minCellZ = static_cast<int>(std::floor((position.z - collisionRadius) / CELL_SIZE));
+  const int maxCellZ = static_cast<int>(std::floor((position.z + collisionRadius) / CELL_SIZE));
 
   for (int z = minCellZ; z <= maxCellZ; ++z){
     for (int x = minCellX; x <= maxCellX; ++x){
@@ -167,3 +167,16 @@ glm::vec3 Player::cameraOffset(){
 glm::vec3 Player::pos() {return pos_;}
 float Player::yaw() {return yaw_;}
 float Player::pitch() {return pitch_;}
+
+Maze::Coord Player::mazeCell() const
+{
+  return {
+    static_cast<int>(std::floor(pos_.x / CELL_SIZE)),
+    static_cast<int>(std::floor(pos_.z / CELL_SIZE))
+  };
+}
+
+bool Player::goalReached() const noexcept
+{
+  return mazeCell() == maze_.getGoal();
+}

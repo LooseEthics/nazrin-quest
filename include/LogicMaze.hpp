@@ -17,6 +17,10 @@ public:
   std::vector<uint8_t> data;
   int unbuiltCells;
 
+  std::vector<uint32_t> distanceFromStart;
+  uint32_t longestDistance = 0;
+  size_t furthestCell = -1;
+  
   [[nodiscard]]
   size_t size() const noexcept;
 
@@ -24,4 +28,6 @@ public:
 
   [[nodiscard]]
   size_t getNextUnbuilt(size_t offset) const noexcept;
+
+
 };

@@ -33,6 +33,12 @@ public:
   float yaw();
   float pitch();
 
+  [[nodiscard]]
+  Maze::Coord mazeCell() const;
+
+  [[nodiscard]]
+  bool goalReached() const noexcept;
+
 private:
   Maze& maze_;
 

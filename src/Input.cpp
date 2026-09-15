@@ -51,6 +51,7 @@ void Input::processEvent(const SDL_Event& event)
 }
 
 bool Input::quitRequested() const noexcept {return quitRequested_;}
+void Input::requestQuit() {quitRequested_ = true;}
 
 bool Input::forward() const noexcept {return forward_;}
 bool Input::backward() const noexcept {return backward_;}
