@@ -14,11 +14,12 @@ int main()
   Maze maze = mg.generate(9, 9);
 
   MazeMeshBuilder meshBuilder;
-  MazeMeshes meshes = meshBuilder.build(maze);
+  Mesh mesh = meshBuilder.build(maze);
 
   Player player{maze};
 
   Renderer renderer{1280, 720, player.camera()};
+  renderer.uploadMesh(mesh);
 
   Input input;
   Uint64 previous = SDL_GetTicks();
@@ -56,10 +57,7 @@ int main()
 
     renderer.clear();
 
-    renderer.draw(meshes.solid, GL_TRIANGLES, {0.5f, 0.5f, 0.5f});
-
-    glLineWidth(3.0f);
-    renderer.draw(meshes.edges, GL_LINES, {0.9f, 0.0f, 0.0f});
+    renderer.draw({0.5f, 0.5f, 0.5f});
 
     renderer.present();
 

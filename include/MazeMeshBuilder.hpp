@@ -27,7 +27,7 @@ class MazeMeshBuilder
 {
 public:
   [[nodiscard]]
-  MazeMeshes build(const Maze& maze) const;
+  Mesh build(const Maze& maze) const;
 
 private:
   void addDirectedQuad(Mesh& mesh, uint32_t baseIndex, Direction dir) const;

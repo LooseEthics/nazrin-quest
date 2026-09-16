@@ -23,11 +23,10 @@ public:
 
   void clear() const;
   void draw(
-    const Mesh& mesh,
-    GLenum primitiveType,
     const glm::vec3& color
   ) const;
   void present() const;
+  void uploadMesh(const Mesh& mesh);
 
   [[nodiscard]]
   SDL_Window* window() const;
@@ -51,4 +50,8 @@ private:
   uint32_t createShaderProgram() const;
 
   Camera& camera_;
+
+  GLsizei triIndexCount_;
+  GLsizei edgeIndexCount_;
+  GLintptr edgeIndexOffset_;
 };

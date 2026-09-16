@@ -14,11 +14,6 @@ struct Vertex
 struct Mesh
 {
   std::vector<Vertex> vertices;
-  std::vector<uint32_t> indices;
-};
-
-struct MazeMeshes
-{
-  Mesh solid;
-  Mesh edges;
+  std::vector<uint32_t> triIndices;
+  std::vector<uint32_t> edgeIndices;
 };

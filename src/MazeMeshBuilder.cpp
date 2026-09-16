@@ -5,15 +5,15 @@
 
 #include "MazeMeshBuilder.hpp"
 
-MazeMeshes MazeMeshBuilder::build(const Maze& maze) const
+Mesh MazeMeshBuilder::build(const Maze& maze) const
 {
-  MazeMeshes meshes;
+  Mesh mesh;
 
   for (int z = 0; z < maze.height(); ++z){
     for (int x = 0; x < maze.width(); ++x){
       if (maze.get(x, z) != Cell::Wall) continue;
 
-      const uint32_t baseIndex = static_cast<uint32_t>(meshes.solid.vertices.size());
+      const uint32_t baseIndex = static_cast<uint32_t>(mesh.vertices.size());
       const std::array<Vertex, 8> cellVertices = {{
         {x * CELL_SIZE      , FLOOR              , z * CELL_SIZE      },
         {(x + 1) * CELL_SIZE, FLOOR              , z * CELL_SIZE      },
@@ -25,30 +25,24 @@ MazeMeshes MazeMeshBuilder::build(const Maze& maze) const
         {x * CELL_SIZE      , FLOOR + WALL_HEIGHT, (z + 1) * CELL_SIZE}
       }};
 
-      meshes.solid.vertices.insert(
-        meshes.solid.vertices.end(),
+      mesh.vertices.insert(
+        mesh.vertices.end(),
         cellVertices.begin(),
         cellVertices.end()
       );
 
-      meshes.edges.vertices.insert(
-        meshes.edges.vertices.end(),
-        cellVertices.begin(),
-        cellVertices.end()
-      );
-
-      addDirectedQuad(meshes.solid, baseIndex, Direction::Up);
+      addDirectedQuad(mesh, baseIndex, Direction::Up);
       for (Direction dir : cardinalDirs){
         if (maze.getNeighbour(x, z, dir) != Cell::Wall)
-          addDirectedQuad(meshes.solid, baseIndex, dir);
+          addDirectedQuad(mesh, baseIndex, dir);
       }
 
-      addCubeFrame(meshes.edges, baseIndex, INDEX_OFFSETS_CUBE_EDGES);
+      addCubeFrame(mesh, baseIndex, INDEX_OFFSETS_CUBE_EDGES);
     }
   }
   // std::cout << "Vertices: " << mesh.vertices.size() << "\n";
   // std::cout << "Indices: " << mesh.indices.size() << "\n";
-  return meshes;
+  return mesh;
 }
 
 void MazeMeshBuilder::addDirectedQuad(
@@ -87,8 +81,8 @@ void MazeMeshBuilder::addQuad(
   uint32_t baseIndex,
   const int offsets[4]
 ) const {
-  mesh.indices.insert(
-    mesh.indices.end(),
+  mesh.triIndices.insert(
+    mesh.triIndices.end(),
     {
       baseIndex + offsets[0],
       baseIndex + offsets[1],
@@ -107,6 +101,6 @@ void MazeMeshBuilder::addCubeFrame(
   const int offsets[24]
 ) const {
   for (int i = 0; i < 24; ++i){
-    mesh.indices.push_back(baseIndex + offsets[i]);
+    mesh.edgeIndices.push_back(baseIndex + offsets[i]);
   }
 }

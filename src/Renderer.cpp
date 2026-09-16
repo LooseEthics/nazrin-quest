@@ -1,40 +1,34 @@
 
+#include <fstream>
 #include <glad/gl.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 
 #include "Renderer.hpp"
 
-namespace {
-
-constexpr const char* VERTEX_SHADER = R"(
-#version 330 core
-
-layout (location = 0) in vec3 position;
-
-uniform mat4 projection;
-uniform mat4 view;
-
-void main()
+namespace
 {
-  gl_Position = projection * view * vec4(position, 1.0);
-}
-)";
+  const char* VERTEX_SHADER_PATH = "shaders/maze.vert";
+  const char* FRAGMENT_SHADER_PATH = "shaders/maze.frag";
 
-constexpr const char* FRAGMENT_SHADER = R"(
-#version 330 core
+  constexpr bool renderEdges = true;
+  constexpr glm::vec3 edgeColor{0.9f, 0.0f, 0.0f};
 
-out vec4 fragmentColor;
+  std::string readFile(const std::string& path)
+  {
+    std::ifstream file(path);
 
-uniform vec3 color;
+    if (!file)
+      throw std::runtime_error("Failed to open shader: " + path);
 
-void main(){
-  fragmentColor = vec4(color, 1.0);
-}
-)";
+    std::stringstream buffer;
+    buffer << file.rdbuf();
 
+    return buffer.str();
+  }
 }
 
 Renderer::Renderer(int width, int height, Camera& camera)
@@ -83,6 +77,22 @@ Renderer::Renderer(int width, int height, Camera& camera)
     0.01f,
     500.0f
   );
+
+  glBindVertexArray(vertexArray_);
+
+  glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer_);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer_);
+
+  glVertexAttribPointer(
+    0,
+    3,
+    GL_FLOAT,
+    GL_FALSE,
+    sizeof(Vertex),
+    nullptr
+  );
+
+  glEnableVertexAttribArray(0);
 }
 
 Renderer::~Renderer()
@@ -115,14 +125,50 @@ void Renderer::present() const
   SDL_GL_SwapWindow(window_);
 }
 
+void Renderer::uploadMesh(const Mesh& mesh)
+{
+
+  glBufferData(
+    GL_ARRAY_BUFFER,
+    mesh.vertices.size() * sizeof(Vertex),
+    mesh.vertices.data(),
+    GL_STATIC_DRAW
+  );
+
+  triIndexCount_ = static_cast<GLsizei>(mesh.triIndices.size());
+  edgeIndexCount_ = static_cast<GLsizei>(mesh.edgeIndices.size());
+
+  const GLsizeiptr triSize = mesh.triIndices.size() * sizeof(uint32_t);
+  const GLsizeiptr edgeSize = mesh.edgeIndices.size() * sizeof(uint32_t);
+
+  edgeIndexOffset_ = static_cast<GLintptr>(triSize);
+
+  glBufferData(
+    GL_ELEMENT_ARRAY_BUFFER,
+    triSize + edgeSize,
+    nullptr,
+    GL_STATIC_DRAW
+  );
+
+  glBufferSubData(
+    GL_ELEMENT_ARRAY_BUFFER,
+    0,
+    triSize,
+    mesh.triIndices.data()
+  );
+
+  glBufferSubData(
+    GL_ELEMENT_ARRAY_BUFFER,
+    edgeIndexOffset_,
+    edgeSize,
+    mesh.edgeIndices.data()
+  );
+}
+
 void Renderer::draw(
-  const Mesh& mesh,
-  GLenum primitiveType,
   const glm::vec3& color
 ) const
 {
-  // TODO: only upload maze meshes once, not every frame
-  // TODO: also link only once
   glUseProgram(shaderProgram_);
 
   const glm::mat4 view = camera_.viewMatrix();
@@ -151,51 +197,29 @@ void Renderer::draw(
     glm::value_ptr(color)
   );
 
-  glBindVertexArray(vertexArray_);
-
-  glBindBuffer(
-    GL_ARRAY_BUFFER,
-    vertexBuffer_
-  );
-
-  glBufferData(
-    GL_ARRAY_BUFFER,
-    mesh.vertices.size() * sizeof(Vertex),
-    mesh.vertices.data(),
-    GL_STATIC_DRAW
-  );
-
-  glBindBuffer(
-    GL_ELEMENT_ARRAY_BUFFER,
-    indexBuffer_
-  );
-
-  glBufferData(
-    GL_ELEMENT_ARRAY_BUFFER,
-    mesh.indices.size() * sizeof(uint32_t),
-    mesh.indices.data(),
-    GL_STATIC_DRAW
-  );
-
-  glVertexAttribPointer(
-    0,
-    3,
-    GL_FLOAT,
-    GL_FALSE,
-    sizeof(Vertex),
-    nullptr
-  );
-
-  glEnableVertexAttribArray(0);
-
   glDrawElements(
-    primitiveType,
-    static_cast<GLsizei>(mesh.indices.size()),
+    GL_TRIANGLES,
+    triIndexCount_,
     GL_UNSIGNED_INT,
     nullptr
   );
 
-  glBindVertexArray(0);
+  if (renderEdges){
+    glLineWidth(3.0f);
+
+    glUniform3fv(
+      colorLocation,
+      1,
+      glm::value_ptr(edgeColor)
+    );
+
+    glDrawElements(
+      GL_LINES,
+      edgeIndexCount_,
+      GL_UNSIGNED_INT,
+      reinterpret_cast<void*>(edgeIndexOffset_)
+    );
+  }
 }
 
 SDL_Window* Renderer::window() const
@@ -239,8 +263,10 @@ uint32_t Renderer::compileShader(
 
 uint32_t Renderer::createShaderProgram() const
 {
-  const GLuint vertexShader = compileShader(GL_VERTEX_SHADER, VERTEX_SHADER);
-  const GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, FRAGMENT_SHADER);
+  const std::string vertexShaderSource = readFile(VERTEX_SHADER_PATH);
+  const std::string fragmentShaderSource = readFile(FRAGMENT_SHADER_PATH);
+  const GLuint vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource.c_str());
+  const GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource.c_str());
   const GLuint program = glCreateProgram();
 
   glAttachShader(program, vertexShader);
