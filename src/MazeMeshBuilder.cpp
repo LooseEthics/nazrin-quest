@@ -23,12 +23,6 @@ Mesh MazeMeshBuilder::build(const Maze& maze) const
         glm::vec3{x * CELL_SIZE      , FLOOR + WALL_HEIGHT, (z + 1) * CELL_SIZE}
       };
 
-      // mesh.vertices.insert(
-      //   mesh.vertices.end(),
-      //   cellVertices.begin(),
-      //   cellVertices.end()
-      // );
-
       if (maze.get(x, z) != Cell::Wall){
         addDirectedQuad(mesh, Direction::Down, vertexPositions);
       } else {
@@ -40,8 +34,6 @@ Mesh MazeMeshBuilder::build(const Maze& maze) const
       }
     }
   }
-  // std::cout << "Vertices: " << mesh.vertices.size() << "\n";
-  // std::cout << "Indices: " << mesh.indices.size() << "\n";
   return mesh;
 }
 

@@ -53,6 +53,8 @@ Mazes are generated using Wilson's algorithm, producing a perfect maze: every ce
 
 The maze is fully enclosed, with no openings to the outside.
 
+The goal is in the cell with greatest distance from the start position.
+
 ## Project Status
 
 Prototype / technical test.
@@ -63,3 +65,7 @@ Prototype / technical test.
 * Glass maze
 * Mirror maze
 * First person player model
+
+## Screenshot
+
+![Nazrin Quest gameplay](screenshots/gameplay.png)
