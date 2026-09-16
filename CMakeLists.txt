@@ -54,6 +54,7 @@ set(SOURCES
   src/Player.cpp
   src/Input.cpp
   src/CommonGeometry.cpp
+  src/Game.cpp
 )
 
 add_executable(nazrin-quest ${SOURCES})

@@ -1,72 +1,8 @@
 
-#include <glad/gl.h>
-#include <iostream>
+#include "Game.hpp"
 
-#include "Maze.hpp"
-#include "MazeGenerator.hpp"
-#include "MazeMeshBuilder.hpp"
-#include "Player.hpp"
-#include "Renderer.hpp"
-
-int main()
-{
-  MazeGenerator mg{69420};
-  Maze maze = mg.generate(9, 9);
-
-  MazeMeshBuilder meshBuilder;
-  Mesh mesh = meshBuilder.build(maze);
-
-  Player player{maze};
-
-  Renderer renderer{1280, 720, player.camera()};
-
-  renderer.uploadMesh(mesh);
-  renderer.setFaceColor(glm::vec3{0.5f, 0.5f, 0.5f});
-  renderer.setEdgeRendering(true);
-  renderer.setEdgeColor(glm::vec3{1.0f, 0.0f, 0.0f});
-
-  Input input;
-  Uint64 previous = SDL_GetTicks();
-
-  while (!input.quitRequested()) {
-    const glm::vec3 pos = player.pos();
-    const float yaw = player.yaw();
-    const float pitch = player.pitch();
-
-    std::string title =
-      "Nazrin Quest | X: " + std::to_string(pos.x) +
-      " Y: " + std::to_string(pos.y) +
-      " Z: " + std::to_string(pos.z) +
-      " Yaw: " + std::to_string(yaw) +
-      " Pitch: " + std::to_string(pitch);
-    SDL_SetWindowTitle(renderer.window(), title.c_str());
-
-    Uint64 current = SDL_GetTicks();
-    float deltaTime = static_cast<float>(current - previous) / 1000.0f;
-    previous = current;
-
-    SDL_Event event;
-
-    while (SDL_PollEvent(&event)){
-      input.processEvent(event);
-    }
-
-    SDL_SetWindowRelativeMouseMode(renderer.window(), input.mouseCaptured());
-    player.update(input, deltaTime);
-
-    if (player.goalReached()){
-      std::cout << "CONGRASHUNZ!\nYOU ARE WINRAR!\n";
-      input.requestQuit();
-    }
-
-    renderer.clear();
-
-    renderer.draw();
-
-    renderer.present();
-
-    input.endFrame();
-  }
-
+int main(){
+  Game game;
+  game.run();
   return 0;
 }
