@@ -205,9 +205,6 @@ void Game::startGame()
   player_ = std::make_unique<Player>(*maze_);
 
   renderer_->uploadMesh(*mesh_);
-  renderer_->setFaceColor(glm::vec3{0.5f, 0.5f, 0.5f});
-  renderer_->setEdgeRendering(true);
-  renderer_->setEdgeColor(glm::vec3{1.0f, 0.0f, 0.0f});
 
   mapVisible_ = false;
   state_ = GameState::Playing;

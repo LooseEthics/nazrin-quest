@@ -212,19 +212,16 @@ void Renderer::uploadMesh(const Mesh& mesh)
 
   wallIndexCount_ = static_cast<GLsizei>(mesh.wallIndices.size());
   floorIndexCount_ = static_cast<GLsizei>(mesh.floorIndices.size());
-  edgeIndexCount_ = static_cast<GLsizei>(mesh.edgeIndices.size());
 
   const GLsizeiptr wallSize = mesh.wallIndices.size() * sizeof(uint32_t);
   const GLsizeiptr floorSize = mesh.floorIndices.size() * sizeof(uint32_t);
-  const GLsizeiptr edgeSize = mesh.edgeIndices.size() * sizeof(uint32_t);
 
   floorIndexOffset_ = static_cast<GLintptr>(wallSize);
-  edgeIndexOffset_ = static_cast<GLintptr>(wallSize + floorSize);
 
 
   glBufferData(
     GL_ELEMENT_ARRAY_BUFFER,
-    wallSize + floorSize + edgeSize,
+    wallSize + floorSize,
     nullptr,
     GL_STATIC_DRAW
   );
@@ -241,13 +238,6 @@ void Renderer::uploadMesh(const Mesh& mesh)
     floorIndexOffset_,
     floorSize,
     mesh.floorIndices.data()
-  );
-
-  glBufferSubData(
-    GL_ELEMENT_ARRAY_BUFFER,
-    edgeIndexOffset_,
-    edgeSize,
-    mesh.edgeIndices.data()
   );
 }
 
@@ -278,12 +268,6 @@ void Renderer::drawCamera(Camera& camera) const
   glActiveTexture(GL_TEXTURE0);
   glUniform1i(textureLocation_, 0);
 
-  // glUniform3fv(
-  //   colorLocation_,
-  //   1,
-  //   glm::value_ptr(faceColor_)
-  // );
-
   glBindTexture(GL_TEXTURE_2D, wallTexture_);
 
   glDrawElements(
@@ -301,23 +285,6 @@ void Renderer::drawCamera(Camera& camera) const
     GL_UNSIGNED_INT,
     reinterpret_cast<void*>(floorIndexOffset_)
   );
-
-  if (renderEdges_){
-    glLineWidth(3.0f);
-
-    glUniform3fv(
-      colorLocation_,
-      1,
-      glm::value_ptr(edgeColor_)
-    );
-
-    glDrawElements(
-      GL_LINES,
-      edgeIndexCount_,
-      GL_UNSIGNED_INT,
-      reinterpret_cast<void*>(edgeIndexOffset_)
-    );
-  }
 }
 
 void Renderer::drawText(
@@ -475,10 +442,6 @@ GLuint Renderer::createShaderProgram(
 
   return program;
 }
-
-void Renderer::setFaceColor(const glm::vec3& color){faceColor_ = color;}
-void Renderer::setEdgeRendering(bool value){renderEdges_ = value;}
-void Renderer::setEdgeColor(const glm::vec3& color){edgeColor_ = color;}
 
 GLuint Renderer::loadTexture(const std::string& path) const
 {

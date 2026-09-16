@@ -37,8 +37,6 @@ Mesh MazeMeshBuilder::build(const Maze& maze) const
           if (maze.getNeighbour(x, z, dir) != Cell::Wall)
             addDirectedQuad(mesh, dir, vertexPositions);
         }
-
-        addCubeFrame(mesh, vertexPositions);
       }
     }
   }
@@ -115,17 +113,4 @@ void MazeMeshBuilder::addQuad(
       baseIndex + 3
     }
   );
-}
-
-void MazeMeshBuilder::addCubeFrame(
-  Mesh& mesh,
-  const std::array<glm::vec3, 8> vertexPositions
-) const {
-  const uint32_t baseIndex = static_cast<uint32_t>(mesh.vertices.size());
-  for (glm::vec3 position : vertexPositions){
-    mesh.vertices.push_back({position, {0.0f, 0.0f}});
-  }
-  for (int i = 0; i < 24; ++i){
-    mesh.edgeIndices.push_back(baseIndex + INDEX_OFFSETS_CUBE_EDGES[i]);
-  }
 }

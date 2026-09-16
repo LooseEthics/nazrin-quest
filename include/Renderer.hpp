@@ -35,10 +35,6 @@ public:
   [[nodiscard]]
   SDL_Window* window() const;
 
-  void setFaceColor(const glm::vec3& color);
-  void setEdgeRendering(bool value);
-  void setEdgeColor(const glm::vec3& color);
-
 private:
   uint32_t width_;
   uint32_t height_;
@@ -69,14 +65,8 @@ private:
 
   GLsizei wallIndexCount_;
   GLsizei floorIndexCount_;
-  GLsizei edgeIndexCount_;
   GLintptr wallIndexOffset_;
   GLintptr floorIndexOffset_;
-  GLintptr edgeIndexOffset_;
-
-  glm::vec3 faceColor_;
-  bool renderEdges_;
-  glm::vec3 edgeColor_;
 
   GLuint loadTexture(const std::string& path) const;
 

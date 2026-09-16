@@ -399,6 +399,16 @@ const Glyph GLYPH_EXCLAMATION = {
   0b00100
 };
 
+const Glyph GLYPH_COLON = {
+  0b00000,
+  0b00100,
+  0b00100,
+  0b00000,
+  0b00100,
+  0b00100,
+  0b00000
+};
+
 constexpr const Glyph getGlyph(char c)
 {
   switch (c){
@@ -504,6 +514,8 @@ constexpr const Glyph getGlyph(char c)
       return GLYPH_SPACE;
     case '!':
       return GLYPH_EXCLAMATION;
+    case ':':
+      return GLYPH_COLON;
     default:
       return GLYPH_BLOCK;
   }

@@ -18,10 +18,6 @@ constexpr int INDEX_OFFSETS_EAST[] = {1, 2, 6, 5};
 constexpr int INDEX_OFFSETS_SOUTH[] = {2, 3, 7, 6};
 constexpr int INDEX_OFFSETS_WEST[] = {0, 3, 7, 4};
 constexpr int INDEX_OFFSETS_NORTH[] = {0, 1, 5, 4};
-constexpr int INDEX_OFFSETS_CUBE_EDGES[] = {
-  0, 1, 1, 2, 2, 3, 3, 0,
-  0, 4, 1, 5, 2, 6, 3, 7,
-  4, 5, 5, 6, 6, 7, 7, 4};
 
 class MazeMeshBuilder
 {
@@ -39,9 +35,5 @@ private:
     Mesh& mesh,
     std::vector<uint32_t>& indexVector,
     const std::array<Vertex, 4> quadVertices
-  ) const;
-  void addCubeFrame(
-    Mesh& mesh,
-    const std::array<glm::vec3, 8> vertexPositions
   ) const;
 };
