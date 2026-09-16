@@ -19,7 +19,11 @@ int main()
   Player player{maze};
 
   Renderer renderer{1280, 720, player.camera()};
+
   renderer.uploadMesh(mesh);
+  renderer.setFaceColor(glm::vec3{0.5f, 0.5f, 0.5f});
+  renderer.setEdgeRendering(true);
+  renderer.setEdgeColor(glm::vec3{1.0f, 0.0f, 0.0f});
 
   Input input;
   Uint64 previous = SDL_GetTicks();
@@ -57,7 +61,7 @@ int main()
 
     renderer.clear();
 
-    renderer.draw({0.5f, 0.5f, 0.5f});
+    renderer.draw();
 
     renderer.present();
 

@@ -11,11 +11,8 @@
 
 namespace
 {
-  const char* VERTEX_SHADER_PATH = "shaders/maze.vert";
-  const char* FRAGMENT_SHADER_PATH = "shaders/maze.frag";
-
-  constexpr bool renderEdges = true;
-  constexpr glm::vec3 edgeColor{0.9f, 0.0f, 0.0f};
+  constexpr const char* VERTEX_SHADER_PATH = "shaders/maze.vert";
+  constexpr const char* FRAGMENT_SHADER_PATH = "shaders/maze.frag";
 
   std::string readFile(const std::string& path)
   {
@@ -70,6 +67,10 @@ Renderer::Renderer(int width, int height, Camera& camera)
   glGenBuffers(1, &indexBuffer_);
 
   shaderProgram_ = createShaderProgram();
+
+  projectionLocation_ = glGetUniformLocation(shaderProgram_, "projection");
+  viewLocation_ = glGetUniformLocation(shaderProgram_, "view");
+  colorLocation_ = glGetUniformLocation(shaderProgram_, "color");
 
   projection_ = glm::perspective(
     glm::radians(80.0f),
@@ -165,36 +166,30 @@ void Renderer::uploadMesh(const Mesh& mesh)
   );
 }
 
-void Renderer::draw(
-  const glm::vec3& color
-) const
+void Renderer::draw() const
 {
   glUseProgram(shaderProgram_);
 
   const glm::mat4 view = camera_.viewMatrix();
 
-  const GLint projectionLocation = glGetUniformLocation(shaderProgram_, "projection");
-  const GLint viewLocation = glGetUniformLocation(shaderProgram_, "view");
-  const GLint colorLocation = glGetUniformLocation(shaderProgram_, "color");
-
   glUniformMatrix4fv(
-    projectionLocation,
+    projectionLocation_,
     1,
     GL_FALSE,
     glm::value_ptr(projection_)
   );
 
   glUniformMatrix4fv(
-    viewLocation,
+    viewLocation_,
     1,
     GL_FALSE,
     glm::value_ptr(view)
   );
 
   glUniform3fv(
-    colorLocation,
+    colorLocation_,
     1,
-    glm::value_ptr(color)
+    glm::value_ptr(faceColor_)
   );
 
   glDrawElements(
@@ -204,13 +199,13 @@ void Renderer::draw(
     nullptr
   );
 
-  if (renderEdges){
+  if (renderEdges_){
     glLineWidth(3.0f);
 
     glUniform3fv(
-      colorLocation,
+      colorLocation_,
       1,
-      glm::value_ptr(edgeColor)
+      glm::value_ptr(edgeColor_)
     );
 
     glDrawElements(
@@ -227,8 +222,8 @@ SDL_Window* Renderer::window() const
   return window_;
 }
 
-uint32_t Renderer::compileShader(
-  uint32_t type,
+GLuint Renderer::compileShader(
+  GLenum type,
   const char* source
 ) const
 {
@@ -261,7 +256,7 @@ uint32_t Renderer::compileShader(
   return shader;
 }
 
-uint32_t Renderer::createShaderProgram() const
+GLuint Renderer::createShaderProgram() const
 {
   const std::string vertexShaderSource = readFile(VERTEX_SHADER_PATH);
   const std::string fragmentShaderSource = readFile(FRAGMENT_SHADER_PATH);
@@ -299,3 +294,7 @@ uint32_t Renderer::createShaderProgram() const
 
   return program;
 }
+
+void Renderer::setFaceColor(const glm::vec3& color){faceColor_ = color;}
+void Renderer::setEdgeRendering(bool value){renderEdges_ = value;}
+void Renderer::setEdgeColor(const glm::vec3& color){edgeColor_ = color;}
