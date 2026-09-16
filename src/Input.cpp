@@ -9,6 +9,11 @@ void Input::processEvent(const SDL_Event& event)
       break;
 
     case SDL_EVENT_KEY_DOWN:
+      if (!event.key.repeat){
+        keysPressed_.insert(event.key.scancode);
+        keysHeld_.insert(event.key.scancode);
+      }
+
       if (event.key.scancode == SDL_SCANCODE_ESCAPE)
         quitRequested_ = true;
       if (!event.key.repeat &&
@@ -26,6 +31,8 @@ void Input::processEvent(const SDL_Event& event)
       break;
 
     case SDL_EVENT_KEY_UP:
+      keysHeld_.erase(event.key.scancode);
+
       if (event.key.scancode == SDL_SCANCODE_W)
         forward_ = false;
       if (event.key.scancode == SDL_SCANCODE_S)
@@ -68,4 +75,15 @@ void Input::endFrame()
 {
   mouseDeltaX_ = 0.0f;
   mouseDeltaY_ = 0.0f;
+  keysPressed_.clear();
+}
+
+bool Input::keyPressed(SDL_Scancode key) const
+{
+  return keysPressed_.contains(key);
+}
+
+bool Input::keyHeld(SDL_Scancode key) const
+{
+  return keysHeld_.contains(key);
 }

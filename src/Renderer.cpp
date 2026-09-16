@@ -6,13 +6,17 @@
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
+#include "Glyphs.hpp"
 #include "Renderer.hpp"
 
 namespace
 {
   constexpr const char* VERTEX_SHADER_PATH = "shaders/maze.vert";
   constexpr const char* FRAGMENT_SHADER_PATH = "shaders/maze.frag";
+  constexpr const char* UI_VERTEX_SHADER_PATH = "shaders/ui.vert";
+  constexpr const char* UI_FRAGMENT_SHADER_PATH = "shaders/ui.frag";
 
   std::string readFile(const std::string& path)
   {
@@ -28,14 +32,18 @@ namespace
   }
 }
 
-Renderer::Renderer(int width, int height, Camera& camera)
-  : window_(nullptr),
+Renderer::Renderer(int width, int height)
+  : width_(width),
+    height_(height),
+    window_(nullptr),
     context_(nullptr),
     vertexArray_(0),
     vertexBuffer_(0),
     indexBuffer_(0),
     shaderProgram_(0),
-    camera_(camera)
+    uiVertexArray_(0),
+    uiVertexBuffer_(0),
+    uiShaderProgram_(0)
 {
   if (!SDL_Init(SDL_INIT_VIDEO)) throw std::runtime_error(SDL_GetError());
 
@@ -45,8 +53,8 @@ Renderer::Renderer(int width, int height, Camera& camera)
 
   window_ = SDL_CreateWindow(
     "Nazrin Quest",
-    width,
-    height,
+    width_,
+    height_,
     SDL_WINDOW_OPENGL
   );
   if (!window_) throw std::runtime_error(SDL_GetError());
@@ -60,13 +68,16 @@ Renderer::Renderer(int width, int height, Camera& camera)
   if (!gladLoadGL(reinterpret_cast<GLADloadfunc>(SDL_GL_GetProcAddress)))
     throw std::runtime_error("Failed to initialize OpenGL");
 
-  glViewport(0, 0, width, height);
+  glViewport(0, 0, width_, height_);
   glEnable(GL_DEPTH_TEST);
+
+
+  // 3d rendering
   glGenVertexArrays(1, &vertexArray_);
   glGenBuffers(1, &vertexBuffer_);
   glGenBuffers(1, &indexBuffer_);
 
-  shaderProgram_ = createShaderProgram();
+  shaderProgram_ = createShaderProgram(VERTEX_SHADER_PATH, FRAGMENT_SHADER_PATH);
 
   projectionLocation_ = glGetUniformLocation(shaderProgram_, "projection");
   viewLocation_ = glGetUniformLocation(shaderProgram_, "view");
@@ -74,13 +85,12 @@ Renderer::Renderer(int width, int height, Camera& camera)
 
   projection_ = glm::perspective(
     glm::radians(80.0f),
-    static_cast<float>(width) / static_cast<float>(height),
+    static_cast<float>(width_) / static_cast<float>(height_),
     0.01f,
     500.0f
   );
 
   glBindVertexArray(vertexArray_);
-
   glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer_);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer_);
 
@@ -94,10 +104,46 @@ Renderer::Renderer(int width, int height, Camera& camera)
   );
 
   glEnableVertexAttribArray(0);
+
+
+  // text rendering
+  glGenVertexArrays(1, &uiVertexArray_);
+  glGenBuffers(1, &uiVertexBuffer_);
+
+  uiShaderProgram_ = createShaderProgram(UI_VERTEX_SHADER_PATH, UI_FRAGMENT_SHADER_PATH);
+
+  uiProjectionLocation_ = glGetUniformLocation(uiShaderProgram_, "projection");
+  uiColorLocation_ = glGetUniformLocation(uiShaderProgram_, "color");
+
+  uiProjection_ = glm::ortho(
+    0.0f,
+    static_cast<float>(width_),
+    static_cast<float>(height_),
+    0.0f
+  );
+
+  glBindVertexArray(uiVertexArray_);
+  glBindBuffer(GL_ARRAY_BUFFER, uiVertexBuffer_);
+
+  glVertexAttribPointer(
+    0,
+    2,
+    GL_FLOAT,
+    GL_FALSE,
+    2 * sizeof(float),
+    nullptr
+  );
+
+  glEnableVertexAttribArray(0);
+
 }
 
 Renderer::~Renderer()
 {
+  if (uiShaderProgram_) glDeleteProgram(uiShaderProgram_);
+  if (uiVertexBuffer_) glDeleteBuffers(1, &uiVertexBuffer_);
+  if (uiVertexArray_) glDeleteVertexArrays(1, &uiVertexArray_);
+
   if (shaderProgram_) glDeleteProgram(shaderProgram_);
   if (indexBuffer_) glDeleteBuffers(1, &indexBuffer_);
   if (vertexBuffer_) glDeleteBuffers(1, &vertexBuffer_);
@@ -128,6 +174,9 @@ void Renderer::present() const
 
 void Renderer::uploadMesh(const Mesh& mesh)
 {
+  glBindVertexArray(vertexArray_);
+  glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer_);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer_);
 
   glBufferData(
     GL_ARRAY_BUFFER,
@@ -166,11 +215,15 @@ void Renderer::uploadMesh(const Mesh& mesh)
   );
 }
 
-void Renderer::draw() const
+void Renderer::drawCamera(Camera& camera) const
 {
+  glBindVertexArray(vertexArray_);
+  glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer_);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer_);
+
   glUseProgram(shaderProgram_);
 
-  const glm::mat4 view = camera_.viewMatrix();
+  const glm::mat4 view = camera.viewMatrix();
 
   glUniformMatrix4fv(
     projectionLocation_,
@@ -217,6 +270,81 @@ void Renderer::draw() const
   }
 }
 
+void Renderer::drawText(
+  const std::string& text,
+  const glm::vec2& position,
+  float scale,
+  const glm::vec3& color
+) const
+{
+  std::vector<glm::vec2> vertices;
+
+  float x = position.x;
+  float y = position.y;
+
+  constexpr float spacing = 1.0f;
+
+  for (char c : text){
+    const Glyph& glyph = getGlyph(c);
+
+    for (int row = 0; row < GLYPH_HEIGHT; ++row){
+      for (int column = 0; column < GLYPH_WIDTH; ++ column){
+        if (!(glyph[row] & (0x1 << (4 - column)))) continue;
+
+        const float x0 = x + column * scale;
+        const float y0 = y + row * scale;
+        const float x1 = x0 + scale;
+        const float y1 = y0 + scale;
+
+        vertices.insert(
+          vertices.end(),
+          {
+            {x0, y0},
+            {x1, y0},
+            {x1, y1},
+
+            {x0, y0},
+            {x1, y1},
+            {x0, y1}
+          }
+        );
+      }
+    }
+    x += (GLYPH_WIDTH + spacing) * scale;
+  }
+
+  glBindVertexArray(uiVertexArray_);
+  glBindBuffer(GL_ARRAY_BUFFER, uiVertexBuffer_);
+
+  glBufferData(
+    GL_ARRAY_BUFFER,
+    vertices.size() * 2 *sizeof(float),
+    vertices.data(),
+    GL_STATIC_DRAW
+  );
+
+  glUseProgram(uiShaderProgram_);
+
+  glUniformMatrix4fv(
+    uiProjectionLocation_,
+    1,
+    GL_FALSE,
+    glm::value_ptr(uiProjection_)
+  );
+
+  glUniform3fv(
+    uiColorLocation_,
+    1,
+    glm::value_ptr(color)
+  );
+
+  glDrawArrays(
+    GL_TRIANGLES,
+    0,
+    static_cast<GLsizei>(vertices.size())
+  );
+}
+
 SDL_Window* Renderer::window() const
 {
   return window_;
@@ -256,10 +384,13 @@ GLuint Renderer::compileShader(
   return shader;
 }
 
-GLuint Renderer::createShaderProgram() const
+GLuint Renderer::createShaderProgram(
+  const std::string& vertexShaderPath,
+  const std::string& fragmentShaderPath
+) const
 {
-  const std::string vertexShaderSource = readFile(VERTEX_SHADER_PATH);
-  const std::string fragmentShaderSource = readFile(FRAGMENT_SHADER_PATH);
+  const std::string vertexShaderSource = readFile(vertexShaderPath);
+  const std::string fragmentShaderSource = readFile(fragmentShaderPath);
   const GLuint vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource.c_str());
   const GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource.c_str());
   const GLuint program = glCreateProgram();

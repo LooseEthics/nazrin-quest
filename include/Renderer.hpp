@@ -4,6 +4,7 @@
 #include <glad/gl.h>
 #include <glm/mat4x4.hpp>
 #include <SDL3/SDL.h>
+#include <string>
 
 #include "Camera.hpp"
 #include "Mesh.hpp"
@@ -13,8 +14,7 @@ class Renderer
 public:
   Renderer(
     int width,
-    int height,
-    Camera& camera
+    int height
   );
   ~Renderer();
 
@@ -22,7 +22,13 @@ public:
   Renderer& operator=(const Renderer&) = delete;
 
   void clear() const;
-  void draw() const;
+  void drawCamera(Camera& camera) const;
+  void drawText(
+    const std::string& text,
+    const glm::vec2& position,
+    float scale,
+    const glm::vec3& color
+  ) const;
   void present() const;
   void uploadMesh(const Mesh& mesh);
 
@@ -34,6 +40,9 @@ public:
   void setEdgeColor(const glm::vec3& color);
 
 private:
+  uint32_t width_;
+  uint32_t height_;
+
   SDL_Window* window_;
   SDL_GLContext context_;
 
@@ -53,9 +62,10 @@ private:
     const char* source
   ) const;
 
-  GLuint createShaderProgram() const;
-
-  Camera& camera_;
+  GLuint createShaderProgram(
+    const std::string& vertexShaderPath,
+    const std::string& fragmentShaderPath
+  ) const;
 
   GLsizei triIndexCount_;
   GLsizei edgeIndexCount_;
@@ -64,4 +74,13 @@ private:
   glm::vec3 faceColor_;
   bool renderEdges_;
   glm::vec3 edgeColor_;
+
+  GLuint uiVertexArray_;
+  GLuint uiVertexBuffer_;
+  GLuint uiShaderProgram_;
+
+  GLuint uiProjectionLocation_;
+  GLuint uiColorLocation_;
+
+  glm::mat4 uiProjection_;
 };

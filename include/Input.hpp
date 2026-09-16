@@ -2,6 +2,7 @@
 #pragma once
 
 #include <SDL3/SDL.h>
+#include <unordered_set>
 
 class Input
 {
@@ -23,6 +24,9 @@ public:
 
   void endFrame();
 
+  bool keyPressed(SDL_Scancode key) const;
+  bool keyHeld(SDL_Scancode key) const;
+
 private:
   bool quitRequested_ = false;
 
@@ -35,4 +39,7 @@ private:
 
   float mouseDeltaX_ = 0.0f;
   float mouseDeltaY_ = 0.0f;
+
+  std::unordered_set<SDL_Scancode> keysPressed_;
+  std::unordered_set<SDL_Scancode> keysHeld_;
 };
