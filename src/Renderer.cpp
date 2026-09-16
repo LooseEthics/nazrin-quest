@@ -12,6 +12,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include "CommonGeometry.hpp"
 #include "Glyphs.hpp"
 #include "Renderer.hpp"
 
@@ -20,6 +21,8 @@ namespace
 {
   constexpr const char* VERTEX_SHADER_PATH = "shaders/maze.vert";
   constexpr const char* FRAGMENT_SHADER_PATH = "shaders/maze.frag";
+  constexpr const char* SPRITE_VERTEX_SHADER_PATH = "shaders/sprite.vert";
+  constexpr const char* SPRITE_FRAGMENT_SHADER_PATH = "shaders/sprite.frag";
   constexpr const char* UI_VERTEX_SHADER_PATH = "shaders/ui.vert";
   constexpr const char* UI_FRAGMENT_SHADER_PATH = "shaders/ui.frag";
 
@@ -48,6 +51,10 @@ Renderer::Renderer(int width, int height)
     shaderProgram_(0),
     wallTexture_(0),
     floorTexture_(0),
+    goalTexture_(0),
+    spriteVertexArray_(0),
+    spriteVertexBuffer_(0),
+    spriteShaderProgram_(0),
     uiVertexArray_(0),
     uiVertexBuffer_(0),
     uiShaderProgram_(0)
@@ -77,9 +84,11 @@ Renderer::Renderer(int width, int height)
 
   glViewport(0, 0, width_, height_);
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
-  // 3d rendering
+  // maze rendering
   glGenVertexArrays(1, &vertexArray_);
   glGenBuffers(1, &vertexBuffer_);
   glGenBuffers(1, &indexBuffer_);
@@ -88,7 +97,6 @@ Renderer::Renderer(int width, int height)
 
   projectionLocation_ = glGetUniformLocation(shaderProgram_, "projection");
   viewLocation_ = glGetUniformLocation(shaderProgram_, "view");
-  colorLocation_ = glGetUniformLocation(shaderProgram_, "color");
   textureLocation_ = glGetUniformLocation(shaderProgram_, "textureSampler");
 
   projection_ = glm::perspective(
@@ -125,9 +133,47 @@ Renderer::Renderer(int width, int height)
   glEnableVertexAttribArray(1);
 
 
+  // sprite rendering
+  glGenVertexArrays(1, &spriteVertexArray_);
+  glGenBuffers(1, &spriteVertexBuffer_);
+
+  spriteShaderProgram_ = createShaderProgram(SPRITE_VERTEX_SHADER_PATH, SPRITE_FRAGMENT_SHADER_PATH);
+
+  spriteProjectionLocation_ = glGetUniformLocation(spriteShaderProgram_, "projection");
+  spriteViewLocation_ = glGetUniformLocation(spriteShaderProgram_, "view");
+  spriteTextureLocation_ = glGetUniformLocation(spriteShaderProgram_, "textureSampler");
+
+  glBindVertexArray(spriteVertexArray_);
+  glBindBuffer(GL_ARRAY_BUFFER, spriteVertexBuffer_);
+
+  glVertexAttribPointer(
+    0,
+    3,
+    GL_FLOAT,
+    GL_FALSE,
+    sizeof(Vertex),
+    nullptr
+  );
+
+  glEnableVertexAttribArray(0);
+
+  glVertexAttribPointer(
+    1,
+    2,
+    GL_FLOAT,
+    GL_FALSE,
+    sizeof(Vertex),
+    reinterpret_cast<void*>(offsetof(Vertex, texCoord))
+  );
+
+  glEnableVertexAttribArray(1);
+
+
   // textures
-  wallTexture_ = loadTexture("assets/wall.png");
-  floorTexture_ = loadTexture("assets/floor.png");
+  wallTexture_ = loadTexture("assets/tex_wall.png");
+  floorTexture_ = loadTexture("assets/tex_floor.png");
+  goalTexture_ = loadTexture("assets/cheese.png");
+
 
   // text rendering
   glGenVertexArrays(1, &uiVertexArray_);
@@ -166,6 +212,7 @@ Renderer::~Renderer()
   if (uiVertexBuffer_) glDeleteBuffers(1, &uiVertexBuffer_);
   if (uiVertexArray_) glDeleteVertexArrays(1, &uiVertexArray_);
 
+  if (goalTexture_) glDeleteTextures(1, &goalTexture_);
   if (floorTexture_) glDeleteTextures(1, &floorTexture_);
   if (wallTexture_) glDeleteTextures(1, &wallTexture_);
 
@@ -242,6 +289,18 @@ void Renderer::uploadMesh(const Mesh& mesh)
 }
 
 void Renderer::drawCamera(Camera& camera) const
+{
+  drawMaze(camera);
+  drawSprite(
+    goalTexture_,
+    goalPosition_,
+    camera,
+    CELL_SIZE / 2,
+    CELL_SIZE / 2
+  );
+}
+
+void Renderer::drawMaze(Camera& camera) const
 {
   glBindVertexArray(vertexArray_);
   glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer_);
@@ -360,6 +419,94 @@ void Renderer::drawText(
     0,
     static_cast<GLsizei>(vertices.size())
   );
+}
+
+void Renderer::drawSprite(
+  GLuint texture,
+  const glm::vec3 position,
+  Camera& camera,
+  float width,
+  float height
+) const
+{
+  glm::vec3 direction = camera.position() - position;
+  direction.y = 0.0f;
+
+  if (glm::length(direction) < 0.001f)
+    return;
+
+  direction = glm::normalize(direction);
+
+  const glm::vec3 right{
+    direction.z,
+    0.0f,
+    -direction.x
+  };
+
+  const glm::vec3 up{0.0f, 1.0f, 0.0f};
+
+  const glm::vec3 bottomLeft  = position - right * (width * 0.5f);
+  const glm::vec3 bottomRight = position + right * (width * 0.5f);
+  const glm::vec3 topLeft     = bottomLeft + up * height;
+  const glm::vec3 topRight    = bottomRight + up * height;
+
+  std::vector<Vertex> vertices{
+    {bottomRight, glm::vec2{1.0f, 1.0f}},
+    {bottomLeft,  glm::vec2{0.0f, 1.0f}},
+    {topLeft,     glm::vec2{0.0f, 0.0f}},
+
+    {bottomRight, glm::vec2{1.0f, 1.0f}},
+    {topLeft,     glm::vec2{0.0f, 0.0f}},
+    {topRight,    glm::vec2{1.0f, 0.0f}}
+  };
+
+  glBindVertexArray(spriteVertexArray_);
+  glBindBuffer(GL_ARRAY_BUFFER, spriteVertexBuffer_);
+
+  glBufferData(
+    GL_ARRAY_BUFFER,
+    vertices.size() * sizeof(Vertex),
+    vertices.data(),
+    GL_STATIC_DRAW
+  );
+
+  glUseProgram(spriteShaderProgram_);
+
+  const glm::mat4 view = camera.viewMatrix();
+
+  glUniformMatrix4fv(
+    spriteProjectionLocation_,
+    1,
+    GL_FALSE,
+    glm::value_ptr(projection_)
+  );
+
+  glUniformMatrix4fv(
+    spriteViewLocation_,
+    1,
+    GL_FALSE,
+    glm::value_ptr(view)
+  );
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, texture);
+
+  glUniform1i(spriteTextureLocation_, 0);
+
+  glDepthMask(GL_FALSE);
+
+  glDrawArrays(
+    GL_TRIANGLES,
+    0,
+    static_cast<GLsizei>(vertices.size())
+  );
+
+  glDepthMask(GL_TRUE);
+}
+
+void Renderer::drawMap(Camera& camera) const
+{
+
 }
 
 SDL_Window* Renderer::window() const
@@ -505,4 +652,9 @@ GLuint Renderer::loadTexture(const std::string& path) const
   stbi_image_free(pixels);
 
   return texture;
+}
+
+void Renderer::setGoalPosition(const glm::vec3 position)
+{
+  goalPosition_ = position;
 }

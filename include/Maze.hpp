@@ -64,6 +64,7 @@ public:
   Coord getStart() const;
   Coord getGoal() const;
   glm::vec3 getStartCoords() const;
+  glm::vec3 getGoalCoords() const;
 
 private:
   int width_;

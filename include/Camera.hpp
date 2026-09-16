@@ -17,6 +17,8 @@ public:
   void setPos(glm::vec3 pos);
   void setRot(float yaw, float pitch);
 
+  glm::vec3 position() const;
+
   glm::mat4 viewMatrix() const;
 
 private:

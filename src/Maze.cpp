@@ -112,3 +112,12 @@ glm::vec3 Maze::getStartCoords() const
     static_cast<float>((static_cast<float>(start_.y) + 0.5) * CELL_SIZE)
   };
 }
+
+glm::vec3 Maze::getGoalCoords() const
+{
+  return {
+    static_cast<float>((static_cast<float>(goal_.x) + 0.5) * CELL_SIZE),
+    0.0f,
+    static_cast<float>((static_cast<float>(goal_.y) + 0.5) * CELL_SIZE)
+  };
+}

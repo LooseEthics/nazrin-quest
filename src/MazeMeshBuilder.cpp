@@ -76,10 +76,10 @@ void MazeMeshBuilder::addDirectedQuad(
       throw std::invalid_argument("Invalid Maze direction");
   }
   const std::array<Vertex, 4> quadVertices = {{
-    {vertexPositions[offsets[0]], glm::vec2{0.0f, 0.0f}},
-    {vertexPositions[offsets[1]], glm::vec2{1.0f, 0.0f}},
-    {vertexPositions[offsets[2]], glm::vec2{1.0f, 1.0f}},
-    {vertexPositions[offsets[3]], glm::vec2{0.0f, 1.0f}}
+    {vertexPositions[offsets[0]], glm::vec2{0.0f, 1.0f}},
+    {vertexPositions[offsets[1]], glm::vec2{1.0f, 1.0f}},
+    {vertexPositions[offsets[2]], glm::vec2{1.0f, 0.0f}},
+    {vertexPositions[offsets[3]], glm::vec2{0.0f, 0.0f}}
   }};
   addQuad(
     mesh,

@@ -23,14 +23,25 @@ public:
 
   void clear() const;
   void drawCamera(Camera& camera) const;
+  void drawMaze(Camera& camera) const;
   void drawText(
     const std::string& text,
     const glm::vec2& position,
     float scale,
     const glm::vec3& color
   ) const;
+  void drawSprite(
+    GLuint texture,
+    const glm::vec3 position,
+    Camera& camera,
+    float width,
+    float height
+  ) const;
+  void drawMap(Camera& camera) const;
   void present() const;
+
   void uploadMesh(const Mesh& mesh);
+  void setGoalPosition(const glm::vec3 position);
 
   [[nodiscard]]
   SDL_Window* window() const;
@@ -72,7 +83,17 @@ private:
 
   GLuint wallTexture_;
   GLuint floorTexture_;
+  GLuint goalTexture_;
+  glm::vec3 goalPosition_;
   GLint textureLocation_;
+
+  GLuint spriteVertexArray_;
+  GLuint spriteVertexBuffer_;
+  GLuint spriteShaderProgram_;
+
+  GLint spriteProjectionLocation_;
+  GLint spriteViewLocation_;
+  GLint spriteTextureLocation_;
 
   GLuint uiVertexArray_;
   GLuint uiVertexBuffer_;

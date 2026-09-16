@@ -140,7 +140,10 @@ void Game::renderConfig()
 void Game::renderPlaying()
 {
   renderer_->clear();
-  renderer_->drawCamera(player_->camera());
+  if (!mapVisible_)
+    renderer_->drawCamera(player_->camera());
+  else
+    renderer_->drawMap(player_->camera());
   renderer_->present();
 }
 
@@ -205,6 +208,7 @@ void Game::startGame()
   player_ = std::make_unique<Player>(*maze_);
 
   renderer_->uploadMesh(*mesh_);
+  renderer_->setGoalPosition(maze_->getGoalCoords());
 
   mapVisible_ = false;
   state_ = GameState::Playing;

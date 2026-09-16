@@ -27,6 +27,11 @@ void Camera::setRot(float yaw, float pitch)
   pitch_ = pitch;
 }
 
+glm::vec3 Camera::position() const
+{
+  return pos_;
+}
+
 glm::mat4 Camera::viewMatrix() const
 {
   return glm::lookAt(
