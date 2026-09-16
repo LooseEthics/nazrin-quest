@@ -67,13 +67,22 @@ private:
     const std::string& fragmentShaderPath
   ) const;
 
-  GLsizei triIndexCount_;
+  GLsizei wallIndexCount_;
+  GLsizei floorIndexCount_;
   GLsizei edgeIndexCount_;
+  GLintptr wallIndexOffset_;
+  GLintptr floorIndexOffset_;
   GLintptr edgeIndexOffset_;
 
   glm::vec3 faceColor_;
   bool renderEdges_;
   glm::vec3 edgeColor_;
+
+  GLuint loadTexture(const std::string& path) const;
+
+  GLuint wallTexture_;
+  GLuint floorTexture_;
+  GLint textureLocation_;
 
   GLuint uiVertexArray_;
   GLuint uiVertexBuffer_;

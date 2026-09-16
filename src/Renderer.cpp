@@ -1,4 +1,5 @@
 
+#include <cstddef>
 #include <fstream>
 #include <glad/gl.h>
 #include <glm/gtc/matrix_transform.hpp>
@@ -8,8 +9,12 @@
 #include <string>
 #include <vector>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
 #include "Glyphs.hpp"
 #include "Renderer.hpp"
+
 
 namespace
 {
@@ -41,6 +46,8 @@ Renderer::Renderer(int width, int height)
     vertexBuffer_(0),
     indexBuffer_(0),
     shaderProgram_(0),
+    wallTexture_(0),
+    floorTexture_(0),
     uiVertexArray_(0),
     uiVertexBuffer_(0),
     uiShaderProgram_(0)
@@ -82,6 +89,7 @@ Renderer::Renderer(int width, int height)
   projectionLocation_ = glGetUniformLocation(shaderProgram_, "projection");
   viewLocation_ = glGetUniformLocation(shaderProgram_, "view");
   colorLocation_ = glGetUniformLocation(shaderProgram_, "color");
+  textureLocation_ = glGetUniformLocation(shaderProgram_, "textureSampler");
 
   projection_ = glm::perspective(
     glm::radians(80.0f),
@@ -105,6 +113,21 @@ Renderer::Renderer(int width, int height)
 
   glEnableVertexAttribArray(0);
 
+  glVertexAttribPointer(
+    1,
+    2,
+    GL_FLOAT,
+    GL_FALSE,
+    sizeof(Vertex),
+    reinterpret_cast<void*>(offsetof(Vertex, texCoord))
+  );
+
+  glEnableVertexAttribArray(1);
+
+
+  // textures
+  wallTexture_ = loadTexture("assets/wall.png");
+  floorTexture_ = loadTexture("assets/floor.png");
 
   // text rendering
   glGenVertexArrays(1, &uiVertexArray_);
@@ -135,7 +158,6 @@ Renderer::Renderer(int width, int height)
   );
 
   glEnableVertexAttribArray(0);
-
 }
 
 Renderer::~Renderer()
@@ -143,6 +165,9 @@ Renderer::~Renderer()
   if (uiShaderProgram_) glDeleteProgram(uiShaderProgram_);
   if (uiVertexBuffer_) glDeleteBuffers(1, &uiVertexBuffer_);
   if (uiVertexArray_) glDeleteVertexArrays(1, &uiVertexArray_);
+
+  if (floorTexture_) glDeleteTextures(1, &floorTexture_);
+  if (wallTexture_) glDeleteTextures(1, &wallTexture_);
 
   if (shaderProgram_) glDeleteProgram(shaderProgram_);
   if (indexBuffer_) glDeleteBuffers(1, &indexBuffer_);
@@ -185,17 +210,21 @@ void Renderer::uploadMesh(const Mesh& mesh)
     GL_STATIC_DRAW
   );
 
-  triIndexCount_ = static_cast<GLsizei>(mesh.triIndices.size());
+  wallIndexCount_ = static_cast<GLsizei>(mesh.wallIndices.size());
+  floorIndexCount_ = static_cast<GLsizei>(mesh.floorIndices.size());
   edgeIndexCount_ = static_cast<GLsizei>(mesh.edgeIndices.size());
 
-  const GLsizeiptr triSize = mesh.triIndices.size() * sizeof(uint32_t);
+  const GLsizeiptr wallSize = mesh.wallIndices.size() * sizeof(uint32_t);
+  const GLsizeiptr floorSize = mesh.floorIndices.size() * sizeof(uint32_t);
   const GLsizeiptr edgeSize = mesh.edgeIndices.size() * sizeof(uint32_t);
 
-  edgeIndexOffset_ = static_cast<GLintptr>(triSize);
+  floorIndexOffset_ = static_cast<GLintptr>(wallSize);
+  edgeIndexOffset_ = static_cast<GLintptr>(wallSize + floorSize);
+
 
   glBufferData(
     GL_ELEMENT_ARRAY_BUFFER,
-    triSize + edgeSize,
+    wallSize + floorSize + edgeSize,
     nullptr,
     GL_STATIC_DRAW
   );
@@ -203,8 +232,15 @@ void Renderer::uploadMesh(const Mesh& mesh)
   glBufferSubData(
     GL_ELEMENT_ARRAY_BUFFER,
     0,
-    triSize,
-    mesh.triIndices.data()
+    wallSize,
+    mesh.wallIndices.data()
+  );
+
+  glBufferSubData(
+    GL_ELEMENT_ARRAY_BUFFER,
+    floorIndexOffset_,
+    floorSize,
+    mesh.floorIndices.data()
   );
 
   glBufferSubData(
@@ -239,17 +275,31 @@ void Renderer::drawCamera(Camera& camera) const
     glm::value_ptr(view)
   );
 
-  glUniform3fv(
-    colorLocation_,
-    1,
-    glm::value_ptr(faceColor_)
-  );
+  glActiveTexture(GL_TEXTURE0);
+  glUniform1i(textureLocation_, 0);
+
+  // glUniform3fv(
+  //   colorLocation_,
+  //   1,
+  //   glm::value_ptr(faceColor_)
+  // );
+
+  glBindTexture(GL_TEXTURE_2D, wallTexture_);
 
   glDrawElements(
     GL_TRIANGLES,
-    triIndexCount_,
+    wallIndexCount_,
     GL_UNSIGNED_INT,
     nullptr
+  );
+
+  glBindTexture(GL_TEXTURE_2D, floorTexture_);
+
+  glDrawElements(
+    GL_TRIANGLES,
+    floorIndexCount_,
+    GL_UNSIGNED_INT,
+    reinterpret_cast<void*>(floorIndexOffset_)
   );
 
   if (renderEdges_){
@@ -429,3 +479,67 @@ GLuint Renderer::createShaderProgram(
 void Renderer::setFaceColor(const glm::vec3& color){faceColor_ = color;}
 void Renderer::setEdgeRendering(bool value){renderEdges_ = value;}
 void Renderer::setEdgeColor(const glm::vec3& color){edgeColor_ = color;}
+
+GLuint Renderer::loadTexture(const std::string& path) const
+{
+  int width;
+  int height;
+  int channels;
+
+  unsigned char* pixels = stbi_load(
+    path.c_str(),
+    &width,
+    &height,
+    &channels,
+    STBI_rgb_alpha
+  );
+
+  if (!pixels)
+    throw std::runtime_error("Failed to load texture: " + path);
+
+  GLuint texture;
+  glGenTextures(1, &texture);
+  glBindTexture(GL_TEXTURE_2D, texture);
+
+  glTexParameteri(
+    GL_TEXTURE_2D,
+    GL_TEXTURE_MIN_FILTER,
+    GL_NEAREST_MIPMAP_LINEAR
+  );
+
+  glTexParameteri(
+    GL_TEXTURE_2D,
+    GL_TEXTURE_MAG_FILTER,
+    GL_NEAREST
+  );
+
+  glTexParameteri(
+    GL_TEXTURE_2D,
+    GL_TEXTURE_WRAP_S,
+    GL_REPEAT
+  );
+
+  glTexParameteri(
+    GL_TEXTURE_2D,
+    GL_TEXTURE_WRAP_T,
+    GL_REPEAT
+  );
+
+  glTexImage2D(
+    GL_TEXTURE_2D,
+    0,
+    GL_RGBA8,
+    width,
+    height,
+    0,
+    GL_RGBA,
+    GL_UNSIGNED_BYTE,
+    pixels
+  );
+
+  glGenerateMipmap(GL_TEXTURE_2D);
+
+  stbi_image_free(pixels);
+
+  return texture;
+}

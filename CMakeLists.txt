@@ -28,6 +28,13 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(glad)
 
+FetchContent_Declare(
+  stb
+  GIT_REPOSITORY https://github.com/nothings/stb.git
+  GIT_TAG master
+)
+FetchContent_MakeAvailable(stb)
+
 glad_add_library(
   glad_gl_core_33
   STATIC
@@ -62,6 +69,7 @@ add_executable(nazrin-quest ${SOURCES})
 target_include_directories(nazrin-quest
   PRIVATE
   include
+  ${stb_SOURCE_DIR}
 )
 
 target_link_libraries(nazrin-quest

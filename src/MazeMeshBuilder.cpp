@@ -11,33 +11,35 @@ Mesh MazeMeshBuilder::build(const Maze& maze) const
 
   for (int z = 0; z < maze.height(); ++z){
     for (int x = 0; x < maze.width(); ++x){
-      if (maze.get(x, z) != Cell::Wall) continue;
-
       const uint32_t baseIndex = static_cast<uint32_t>(mesh.vertices.size());
-      const std::array<Vertex, 8> cellVertices = {{
-        {x * CELL_SIZE      , FLOOR              , z * CELL_SIZE      },
-        {(x + 1) * CELL_SIZE, FLOOR              , z * CELL_SIZE      },
-        {(x + 1) * CELL_SIZE, FLOOR              , (z + 1) * CELL_SIZE},
-        {x * CELL_SIZE      , FLOOR              , (z + 1) * CELL_SIZE},
-        {x * CELL_SIZE      , FLOOR + WALL_HEIGHT, z * CELL_SIZE      },
-        {(x + 1) * CELL_SIZE, FLOOR + WALL_HEIGHT, z * CELL_SIZE      },
-        {(x + 1) * CELL_SIZE, FLOOR + WALL_HEIGHT, (z + 1) * CELL_SIZE},
-        {x * CELL_SIZE      , FLOOR + WALL_HEIGHT, (z + 1) * CELL_SIZE}
-      }};
+      const std::array<glm::vec3, 8> vertexPositions = {
+        glm::vec3{x * CELL_SIZE      , FLOOR              , z * CELL_SIZE      },
+        glm::vec3{(x + 1) * CELL_SIZE, FLOOR              , z * CELL_SIZE      },
+        glm::vec3{(x + 1) * CELL_SIZE, FLOOR              , (z + 1) * CELL_SIZE},
+        glm::vec3{x * CELL_SIZE      , FLOOR              , (z + 1) * CELL_SIZE},
+        glm::vec3{x * CELL_SIZE      , FLOOR + WALL_HEIGHT, z * CELL_SIZE      },
+        glm::vec3{(x + 1) * CELL_SIZE, FLOOR + WALL_HEIGHT, z * CELL_SIZE      },
+        glm::vec3{(x + 1) * CELL_SIZE, FLOOR + WALL_HEIGHT, (z + 1) * CELL_SIZE},
+        glm::vec3{x * CELL_SIZE      , FLOOR + WALL_HEIGHT, (z + 1) * CELL_SIZE}
+      };
 
-      mesh.vertices.insert(
-        mesh.vertices.end(),
-        cellVertices.begin(),
-        cellVertices.end()
-      );
+      // mesh.vertices.insert(
+      //   mesh.vertices.end(),
+      //   cellVertices.begin(),
+      //   cellVertices.end()
+      // );
 
-      addDirectedQuad(mesh, baseIndex, Direction::Up);
-      for (Direction dir : cardinalDirs){
-        if (maze.getNeighbour(x, z, dir) != Cell::Wall)
-          addDirectedQuad(mesh, baseIndex, dir);
+      if (maze.get(x, z) != Cell::Wall){
+        addDirectedQuad(mesh, Direction::Down, vertexPositions);
+      } else {
+        addDirectedQuad(mesh, Direction::Up, vertexPositions);
+        for (Direction dir : cardinalDirs){
+          if (maze.getNeighbour(x, z, dir) != Cell::Wall)
+            addDirectedQuad(mesh, dir, vertexPositions);
+        }
+
+        addCubeFrame(mesh, vertexPositions);
       }
-
-      addCubeFrame(mesh, baseIndex, INDEX_OFFSETS_CUBE_EDGES);
     }
   }
   // std::cout << "Vertices: " << mesh.vertices.size() << "\n";
@@ -47,16 +49,18 @@ Mesh MazeMeshBuilder::build(const Maze& maze) const
 
 void MazeMeshBuilder::addDirectedQuad(
   Mesh& mesh,
-  uint32_t baseIndex,
-  Direction dir
+  Direction dir,
+  const std::array<glm::vec3, 8> vertexPositions
 ) const {
   const int* offsets;
+  bool floor = false;
   switch (dir){
     case Direction::Up:
       offsets = INDEX_OFFSETS_TOP;
       break;
     case Direction::Down:
       offsets = INDEX_OFFSETS_BOTTOM;
+      floor = true;
       break;
     case Direction::East:
       offsets = INDEX_OFFSETS_EAST;
@@ -73,34 +77,55 @@ void MazeMeshBuilder::addDirectedQuad(
     default:
       throw std::invalid_argument("Invalid Maze direction");
   }
-  addQuad(mesh, baseIndex, offsets);
+  const std::array<Vertex, 4> quadVertices = {{
+    {vertexPositions[offsets[0]], glm::vec2{0.0f, 0.0f}},
+    {vertexPositions[offsets[1]], glm::vec2{1.0f, 0.0f}},
+    {vertexPositions[offsets[2]], glm::vec2{1.0f, 1.0f}},
+    {vertexPositions[offsets[3]], glm::vec2{0.0f, 1.0f}}
+  }};
+  addQuad(
+    mesh,
+    (floor ? mesh.floorIndices : mesh.wallIndices),
+    quadVertices
+  );
 }
 
 void MazeMeshBuilder::addQuad(
   Mesh& mesh,
-  uint32_t baseIndex,
-  const int offsets[4]
+  std::vector<uint32_t>& indexVector,
+  const std::array<Vertex, 4> quadVertices
 ) const {
-  mesh.triIndices.insert(
-    mesh.triIndices.end(),
-    {
-      baseIndex + offsets[0],
-      baseIndex + offsets[1],
-      baseIndex + offsets[2],
+  const uint32_t baseIndex = static_cast<uint32_t>(mesh.vertices.size());
 
-      baseIndex + offsets[0],
-      baseIndex + offsets[2],
-      baseIndex + offsets[3]
+  mesh.vertices.insert(
+    mesh.vertices.end(),
+    quadVertices.begin(),
+    quadVertices.end()
+  );
+
+  indexVector.insert(
+    indexVector.end(),
+    {
+      baseIndex + 0,
+      baseIndex + 1,
+      baseIndex + 2,
+
+      baseIndex + 0,
+      baseIndex + 2,
+      baseIndex + 3
     }
   );
 }
 
 void MazeMeshBuilder::addCubeFrame(
   Mesh& mesh,
-  uint32_t baseIndex,
-  const int offsets[24]
+  const std::array<glm::vec3, 8> vertexPositions
 ) const {
+  const uint32_t baseIndex = static_cast<uint32_t>(mesh.vertices.size());
+  for (glm::vec3 position : vertexPositions){
+    mesh.vertices.push_back({position, {0.0f, 0.0f}});
+  }
   for (int i = 0; i < 24; ++i){
-    mesh.edgeIndices.push_back(baseIndex + offsets[i]);
+    mesh.edgeIndices.push_back(baseIndex + INDEX_OFFSETS_CUBE_EDGES[i]);
   }
 }

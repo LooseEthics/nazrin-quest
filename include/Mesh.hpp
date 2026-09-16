@@ -6,14 +6,14 @@
 
 struct Vertex
 {
-  float x;
-  float y;
-  float z;
+  glm::vec3 position;
+  glm::vec2 texCoord;
 };
 
 struct Mesh
 {
   std::vector<Vertex> vertices;
-  std::vector<uint32_t> triIndices;
+  std::vector<uint32_t> wallIndices;
+  std::vector<uint32_t> floorIndices;
   std::vector<uint32_t> edgeIndices;
 };
