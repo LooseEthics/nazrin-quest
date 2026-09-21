@@ -28,6 +28,8 @@ void Input::processEvent(const SDL_Event& event)
         left_ = true;
       if (event.key.scancode == SDL_SCANCODE_D)
         right_ = true;
+      if (event.key.scancode == SDL_SCANCODE_M)
+        mapTrigger_ = !mapTrigger_;
       break;
 
     case SDL_EVENT_KEY_UP:
@@ -65,6 +67,7 @@ bool Input::forward() const noexcept {return forward_;}
 bool Input::backward() const noexcept {return backward_;}
 bool Input::right() const noexcept {return right_;}
 bool Input::left() const noexcept {return left_;}
+bool Input::mapTrigger() const noexcept {return mapTrigger_;}
 
 bool Input::mouseCaptured() const noexcept {return mouseCaptured_;}
 

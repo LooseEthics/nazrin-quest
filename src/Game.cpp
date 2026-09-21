@@ -103,6 +103,8 @@ void Game::updatePlaying(float deltaTime)
 {
   player_->update(*input_, deltaTime);
 
+  mapVisible_ = input_->mapTrigger();
+
   if (player_->goalReached()){
     state_ = GameState::Won;
   }
@@ -208,6 +210,7 @@ void Game::startGame()
   player_ = std::make_unique<Player>(*maze_);
 
   renderer_->uploadMesh(*mesh_);
+  renderer_->createMapTexture(*maze_);
   renderer_->setGoalPosition(maze_->getGoalCoords());
 
   mapVisible_ = false;

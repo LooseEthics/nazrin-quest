@@ -16,6 +16,7 @@ public:
   bool backward() const noexcept;
   bool right() const noexcept;
   bool left() const noexcept;
+  bool mapTrigger() const noexcept;
 
   bool mouseCaptured() const noexcept;
 
@@ -34,6 +35,7 @@ private:
   bool backward_ = false;
   bool right_ = false;
   bool left_ = false;
+  bool mapTrigger_ = false;
 
   bool mouseCaptured_ = true;
 

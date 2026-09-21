@@ -7,6 +7,7 @@
 #include <string>
 
 #include "Camera.hpp"
+#include "Maze.hpp"
 #include "Mesh.hpp"
 
 class Renderer
@@ -41,6 +42,7 @@ public:
   void present() const;
 
   void uploadMesh(const Mesh& mesh);
+  void createMapTexture(const Maze& maze);
   void setGoalPosition(const glm::vec3 position);
 
   [[nodiscard]]
@@ -53,16 +55,16 @@ private:
   SDL_Window* window_;
   SDL_GLContext context_;
 
-  GLuint vertexArray_;
-  GLuint vertexBuffer_;
-  GLuint indexBuffer_;
-  GLuint shaderProgram_;
+  GLuint mazeVertexArray_;
+  GLuint mazeVertexBuffer_;
+  GLuint mazeIndexBuffer_;
+  GLuint mazeShaderProgram_;
 
-  GLint projectionLocation_;
-  GLint viewLocation_;
-  GLint colorLocation_;
+  GLint mazeProjectionLocation_;
+  GLint mazeViewLocation_;
+  GLint mazeTextureLocation_;
 
-  glm::mat4 projection_;
+  glm::mat4 mazeProjection_;
 
   GLuint compileShader(
     GLenum type,
@@ -85,7 +87,6 @@ private:
   GLuint floorTexture_;
   GLuint goalTexture_;
   glm::vec3 goalPosition_;
-  GLint textureLocation_;
 
   GLuint spriteVertexArray_;
   GLuint spriteVertexBuffer_;
@@ -103,4 +104,15 @@ private:
   GLuint uiColorLocation_;
 
   glm::mat4 uiProjection_;
+
+  GLuint mapTexture_;
+  GLuint mapVertexArray_;
+  GLuint mapVertexBuffer_;
+  GLuint mapShaderProgram_;
+
+  GLint mapProjectionLocation_;
+  GLint mapTextureLocation_;
+
+  int mapWidth_;
+  int mapHeight_;
 };
