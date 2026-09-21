@@ -40,7 +40,7 @@ public:
     float width,
     float height
   ) const;
-  void drawMap(Camera& camera) const;
+  void drawMap(glm::vec3 pos, float yaw) const;
   void present() const;
 
   void uploadMesh(const Mesh& mesh);
@@ -127,4 +127,10 @@ private:
 
   int mapWidth_;
   int mapHeight_;
+
+  GLuint mapMarkerVertexArray_;
+  GLuint mapMarkerVertexBuffer_;
+  GLuint mapMarkerShaderProgram_;
+
+  GLint mapMarkerProjectionLocation_;
 };

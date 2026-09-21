@@ -23,7 +23,10 @@ void Renderer::initMaze()
   glGenBuffers(1, &mazeVertexBuffer_);
   glGenBuffers(1, &mazeIndexBuffer_);
 
-  mazeShaderProgram_ = createShaderProgram(MAZE_VERTEX_SHADER_PATH, MAZE_FRAGMENT_SHADER_PATH);
+  mazeShaderProgram_ = createShaderProgram(
+    MAZE_VERTEX_SHADER_PATH,
+    MAZE_FRAGMENT_SHADER_PATH
+  );
 
   mazeProjectionLocation_ = glGetUniformLocation(mazeShaderProgram_, "projection");
   mazeViewLocation_ = glGetUniformLocation(mazeShaderProgram_, "view");

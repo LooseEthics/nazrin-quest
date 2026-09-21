@@ -43,6 +43,8 @@ Hold LShift         Value step ×100
 ```text
 Mouse movement      Camera control
 WASD                Movement
+M                   Toggle map
+
 Alt                 Release mouse
 Esc                 Quit game
 ```

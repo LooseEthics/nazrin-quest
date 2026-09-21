@@ -145,7 +145,7 @@ void Game::renderPlaying()
   if (!mapVisible_)
     renderer_->drawCamera(player_->camera());
   else
-    renderer_->drawMap(player_->camera());
+    renderer_->drawMap(player_->pos(), player_->yaw());
   renderer_->present();
 }
 
@@ -211,7 +211,6 @@ void Game::startGame()
 
   renderer_->uploadMesh(*mesh_);
   renderer_->createMapTexture(*maze_);
-  renderer_->setGoalPosition(maze_->getGoalCoords());
 
   mapVisible_ = false;
   state_ = GameState::Playing;

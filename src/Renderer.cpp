@@ -41,7 +41,14 @@ Renderer::Renderer(int width, int height)
     spriteShaderProgram_(0),
     uiVertexArray_(0),
     uiVertexBuffer_(0),
-    uiShaderProgram_(0)
+    uiShaderProgram_(0),
+    mapVertexArray_(0),
+    mapVertexBuffer_(0),
+    mapShaderProgram_(0),
+    mapTexture_(0),
+    mapMarkerVertexArray_(0),
+    mapMarkerVertexBuffer_(0),
+    mapMarkerShaderProgram_(0)
 {
   if (!SDL_Init(SDL_INIT_VIDEO)) throw std::runtime_error(SDL_GetError());
 
@@ -83,7 +90,7 @@ Renderer::~Renderer()
   destroyMap();
   destroySprite();
   destroyMaze();
-  
+
   if (context_) SDL_GL_DestroyContext(context_);
   if (window_) SDL_DestroyWindow(window_);
 

@@ -19,7 +19,10 @@ void Renderer::initText()
   glGenVertexArrays(1, &uiVertexArray_);
   glGenBuffers(1, &uiVertexBuffer_);
 
-  uiShaderProgram_ = createShaderProgram(UI_VERTEX_SHADER_PATH, UI_FRAGMENT_SHADER_PATH);
+  uiShaderProgram_ = createShaderProgram(
+    UI_VERTEX_SHADER_PATH,
+    UI_FRAGMENT_SHADER_PATH
+  );
 
   uiProjectionLocation_ = glGetUniformLocation(uiShaderProgram_, "projection");
   uiColorLocation_ = glGetUniformLocation(uiShaderProgram_, "color");

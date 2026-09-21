@@ -11,14 +11,21 @@ namespace
 {
   constexpr const char* MAP_VERTEX_SHADER_PATH = "shaders/map.vert";
   constexpr const char* MAP_FRAGMENT_SHADER_PATH = "shaders/map.frag";
+  constexpr const char* MAP_MARKER_VERTEX_SHADER_PATH = "shaders/map_marker.vert";
+  constexpr const char* MAP_MARKER_FRAGMENT_SHADER_PATH = "shaders/map_marker.frag";
+
 }
 
 void Renderer::initMap()
 {
+  // map itself
   glGenVertexArrays(1, &mapVertexArray_);
   glGenBuffers(1, &mapVertexBuffer_);
 
-  mapShaderProgram_ = createShaderProgram(MAP_VERTEX_SHADER_PATH, MAP_FRAGMENT_SHADER_PATH);
+  mapShaderProgram_ = createShaderProgram(
+    MAP_VERTEX_SHADER_PATH,
+    MAP_FRAGMENT_SHADER_PATH
+  );
 
   mapProjectionLocation_ = glGetUniformLocation(mapShaderProgram_, "projection");
   mapTextureLocation_ = glGetUniformLocation(mapShaderProgram_, "textureSampler");
@@ -47,10 +54,38 @@ void Renderer::initMap()
   );
 
   glEnableVertexAttribArray(1);
+
+  // map marker
+  glGenVertexArrays(1, &mapMarkerVertexArray_);
+  glGenBuffers(1, &mapMarkerVertexBuffer_);
+
+  mapMarkerShaderProgram_ = createShaderProgram(
+    MAP_MARKER_VERTEX_SHADER_PATH,
+    MAP_MARKER_FRAGMENT_SHADER_PATH
+  );
+
+  mapMarkerProjectionLocation_ = glGetUniformLocation(mapMarkerShaderProgram_, "projection");
+
+  glBindVertexArray(mapMarkerVertexArray_);
+  glBindBuffer(GL_ARRAY_BUFFER, mapMarkerVertexBuffer_);
+
+  glVertexAttribPointer(
+    0,
+    2,
+    GL_FLOAT,
+    GL_FALSE,
+    2 * sizeof(float),
+    nullptr
+  );
+
+  glEnableVertexAttribArray(0);
 }
 
 void Renderer::destroyMap()
 {
+  if (mapMarkerShaderProgram_) glDeleteProgram(mapMarkerShaderProgram_);
+  if (mapMarkerVertexBuffer_) glDeleteBuffers(1, &mapMarkerVertexBuffer_);
+  if (mapMarkerVertexArray_) glDeleteVertexArrays(1, &mapMarkerVertexArray_);
   if (mapShaderProgram_) glDeleteProgram(mapShaderProgram_);
   if (mapVertexBuffer_) glDeleteBuffers(1, &mapVertexBuffer_);
   if (mapVertexArray_) glDeleteVertexArrays(1, &mapVertexArray_);
@@ -117,6 +152,8 @@ void Renderer::createMapTexture(const Maze& maze)
     GL_UNSIGNED_BYTE,
     pixels.data()
   );
+
+  setGoalPosition(maze.getGoalCoords());
 }
 
 void Renderer::setGoalPosition(const glm::vec3 position)
@@ -124,7 +161,7 @@ void Renderer::setGoalPosition(const glm::vec3 position)
   goalPosition_ = position;
 }
 
-void Renderer::drawMap(Camera& camera) const
+void Renderer::drawMap(glm::vec3 pos, float yaw) const
 {
   constexpr float margin = 50.0f;
   constexpr float mapMaxSize = 600.0f;
@@ -202,6 +239,59 @@ void Renderer::drawMap(Camera& camera) const
     0,
     6
   );
+
+
+  // map marker
+  const float markerSize = 10.0f;
+
+  const std::array<glm::vec2, 3> marker{
+    glm::vec2{              0.0f, -markerSize},
+    glm::vec2{ markerSize * 0.6f,  markerSize},
+    glm::vec2{-markerSize * 0.6f,  markerSize}
+  };
+
+  const float playerX = x0 + (pos.x / static_cast<float>(mapWidth_)) * mapWidth / CELL_SIZE;
+  const float playerY = y0 + (pos.z / static_cast<float>(mapHeight_)) * mapHeight / CELL_SIZE;
+
+  const float angle = yaw + glm::half_pi<float>();
+  const float c = std::cos(angle);
+  const float s = std::sin(angle);
+
+  std::array<glm::vec2, 3> markerVertices;
+  for (size_t i = 0; i < marker.size(); ++i){
+    const glm::vec2 p = marker[i];
+
+    markerVertices[i] = glm::vec2{
+      playerX + p.x * c - p.y * s,
+      playerY + p.x * s + p.y * c
+    };
+  }
+
+  glBindVertexArray(mapMarkerVertexArray_);
+  glBindBuffer(GL_ARRAY_BUFFER, mapMarkerVertexBuffer_);
+
+  glBufferData(
+    GL_ARRAY_BUFFER,
+    markerVertices.size() * sizeof(glm::vec2),
+    markerVertices.data(),
+    GL_DYNAMIC_DRAW
+  );
+
+  glUseProgram(mapMarkerShaderProgram_);
+
+  glUniformMatrix4fv(
+    mapMarkerProjectionLocation_,
+    1,
+    GL_FALSE,
+    glm::value_ptr(uiProjection_)
+  );
+
+  glDrawArrays(
+    GL_TRIANGLES,
+    0,
+    3
+  );
+
 
   glEnable(GL_DEPTH_TEST);
 }

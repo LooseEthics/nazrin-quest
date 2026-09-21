@@ -21,7 +21,10 @@ void Renderer::initSprite()
   glGenVertexArrays(1, &spriteVertexArray_);
   glGenBuffers(1, &spriteVertexBuffer_);
 
-  spriteShaderProgram_ = createShaderProgram(SPRITE_VERTEX_SHADER_PATH, SPRITE_FRAGMENT_SHADER_PATH);
+  spriteShaderProgram_ = createShaderProgram(
+    SPRITE_VERTEX_SHADER_PATH,
+    SPRITE_FRAGMENT_SHADER_PATH
+  );
 
   spriteProjectionLocation_ = glGetUniformLocation(spriteShaderProgram_, "projection");
   spriteViewLocation_ = glGetUniformLocation(spriteShaderProgram_, "view");
