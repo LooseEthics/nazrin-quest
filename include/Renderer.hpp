@@ -10,6 +10,8 @@
 #include "Maze.hpp"
 #include "Mesh.hpp"
 
+std::string readFile(const std::string& path);
+
 class Renderer
 {
 public:
@@ -21,6 +23,11 @@ public:
 
   Renderer(const Renderer&) = delete;
   Renderer& operator=(const Renderer&) = delete;
+
+  void initMap();
+  void initMaze();
+  void initSprite();
+  void initText();
 
   void clear() const;
   void drawCamera(Camera& camera) const;
