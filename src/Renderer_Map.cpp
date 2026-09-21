@@ -22,13 +22,13 @@ void Renderer::initMap()
   glGenVertexArrays(1, &mapVertexArray_);
   glGenBuffers(1, &mapVertexBuffer_);
 
-  mapShaderProgram_ = createShaderProgram(
+  mapShaderProgram_ = Shader{
     MAP_VERTEX_SHADER_PATH,
     MAP_FRAGMENT_SHADER_PATH
-  );
+  };
 
-  mapProjectionLocation_ = glGetUniformLocation(mapShaderProgram_, "projection");
-  mapTextureLocation_ = glGetUniformLocation(mapShaderProgram_, "textureSampler");
+  mapProjectionLocation_ = mapShaderProgram_.projectionLocation();
+  mapTextureLocation_ = mapShaderProgram_.textureLocation();
 
   glBindVertexArray(mapVertexArray_);
   glBindBuffer(GL_ARRAY_BUFFER, mapVertexBuffer_);
@@ -59,12 +59,12 @@ void Renderer::initMap()
   glGenVertexArrays(1, &mapMarkerVertexArray_);
   glGenBuffers(1, &mapMarkerVertexBuffer_);
 
-  mapMarkerShaderProgram_ = createShaderProgram(
+  mapMarkerShaderProgram_ = Shader{
     MAP_MARKER_VERTEX_SHADER_PATH,
     MAP_MARKER_FRAGMENT_SHADER_PATH
-  );
+  };
 
-  mapMarkerProjectionLocation_ = glGetUniformLocation(mapMarkerShaderProgram_, "projection");
+  mapMarkerProjectionLocation_ = mapMarkerShaderProgram_.projectionLocation();
 
   glBindVertexArray(mapMarkerVertexArray_);
   glBindBuffer(GL_ARRAY_BUFFER, mapMarkerVertexBuffer_);
@@ -83,10 +83,8 @@ void Renderer::initMap()
 
 void Renderer::destroyMap()
 {
-  if (mapMarkerShaderProgram_) glDeleteProgram(mapMarkerShaderProgram_);
   if (mapMarkerVertexBuffer_) glDeleteBuffers(1, &mapMarkerVertexBuffer_);
   if (mapMarkerVertexArray_) glDeleteVertexArrays(1, &mapMarkerVertexArray_);
-  if (mapShaderProgram_) glDeleteProgram(mapShaderProgram_);
   if (mapVertexBuffer_) glDeleteBuffers(1, &mapVertexBuffer_);
   if (mapVertexArray_) glDeleteVertexArrays(1, &mapVertexArray_);
 }
@@ -182,7 +180,7 @@ void Renderer::drawMap(glm::vec3 pos, float yaw) const
     GL_DYNAMIC_DRAW
   );
 
-  glUseProgram(mapShaderProgram_);
+  mapShaderProgram_.use();
 
   glUniformMatrix4fv(
     mapProjectionLocation_,
@@ -239,7 +237,7 @@ void Renderer::drawMap(glm::vec3 pos, float yaw) const
     GL_DYNAMIC_DRAW
   );
 
-  glUseProgram(mapMarkerShaderProgram_);
+  mapMarkerShaderProgram_.use();
 
   glUniformMatrix4fv(
     mapMarkerProjectionLocation_,

@@ -1,7 +1,6 @@
 
 #include <fstream>
 #include <glad/gl.h>
-#include <sstream>
 #include <stdexcept>
 #include <string>
 
@@ -9,19 +8,6 @@
 
 #include "CommonGeometry.hpp"
 #include "Renderer.hpp"
-
-std::string readFile(const std::string& path)
-{
-  std::ifstream file(path);
-
-  if (!file)
-    throw std::runtime_error("Failed to open shader: " + path);
-
-  std::stringstream buffer;
-  buffer << file.rdbuf();
-
-  return buffer.str();
-}
 
 Renderer::Renderer(int width, int height)
   : width_(width),
@@ -31,21 +17,15 @@ Renderer::Renderer(int width, int height)
     mazeVertexArray_(0),
     mazeVertexBuffer_(0),
     mazeIndexBuffer_(0),
-    mazeShaderProgram_(0),
     spriteVertexArray_(0),
     spriteVertexBuffer_(0),
-    spriteShaderProgram_(0),
     uiVertexArray_(0),
     uiVertexBuffer_(0),
-    uiShaderProgram_(0),
     mapVertexArray_(0),
     mapVertexBuffer_(0),
-    mapShaderProgram_(0),
     mapMarkerVertexArray_(0),
-    mapMarkerVertexBuffer_(0),
-    mapMarkerShaderProgram_(0)
+    mapMarkerVertexBuffer_(0)
 {
-  std::cout << "renderer\n";
   if (!SDL_Init(SDL_INIT_VIDEO)) throw std::runtime_error(SDL_GetError());
 
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -74,15 +54,10 @@ Renderer::Renderer(int width, int height)
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  std::cout << "preinit\n";
   initMaze();
-  std::cout << "postmaze\n";
   initSprite();
-  std::cout << "postsprite\n";
   initMap();
-  std::cout << "postmap\n";
   initText();
-  std::cout << "postinit\n";
 }
 
 Renderer::~Renderer()
@@ -130,80 +105,4 @@ void Renderer::drawCamera(Camera& camera) const
 SDL_Window* Renderer::window() const
 {
   return window_;
-}
-
-GLuint Renderer::compileShader(
-  GLenum type,
-  const char* source
-) const
-{
-  const GLuint shader = glCreateShader(type);
-
-  glShaderSource(shader, 1, &source, nullptr);
-  glCompileShader(shader);
-
-  GLint success = 0;
-  glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-
-  if (!success){
-    GLint logLength = 0;
-    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
-
-    std::string log(logLength, '\0');
-
-    glGetShaderInfoLog(
-      shader,
-      logLength,
-      nullptr,
-      log.data()
-    );
-
-    glDeleteShader(shader);
-
-    throw std::runtime_error("Shader compilation failed:\n" + log);
-  }
-
-  return shader;
-}
-
-GLuint Renderer::createShaderProgram(
-  const std::string& vertexShaderPath,
-  const std::string& fragmentShaderPath
-) const
-{
-  const std::string vertexShaderSource = readFile(vertexShaderPath);
-  const std::string fragmentShaderSource = readFile(fragmentShaderPath);
-  const GLuint vertexShader = compileShader(GL_VERTEX_SHADER, vertexShaderSource.c_str());
-  const GLuint fragmentShader = compileShader(GL_FRAGMENT_SHADER, fragmentShaderSource.c_str());
-  const GLuint program = glCreateProgram();
-
-  glAttachShader(program, vertexShader);
-  glAttachShader(program, fragmentShader);
-  glLinkProgram(program);
-
-  glDeleteShader(vertexShader);
-  glDeleteShader(fragmentShader);
-
-  GLint success = 0;
-  glGetProgramiv(program, GL_LINK_STATUS, &success);
-
-  if (!success){
-    GLint logLength = 0;
-    glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
-
-    std::string log(logLength, '\0');
-
-    glGetProgramInfoLog(
-      program,
-      logLength,
-      nullptr,
-      log.data()
-    );
-
-    glDeleteProgram(program);
-
-    throw std::runtime_error("Shader linking failed:\n" + log);
-  }
-
-  return program;
 }

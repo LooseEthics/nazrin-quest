@@ -19,13 +19,13 @@ void Renderer::initText()
   glGenVertexArrays(1, &uiVertexArray_);
   glGenBuffers(1, &uiVertexBuffer_);
 
-  uiShaderProgram_ = createShaderProgram(
+  uiShaderProgram_ = Shader{
     UI_VERTEX_SHADER_PATH,
     UI_FRAGMENT_SHADER_PATH
-  );
+  };
 
-  uiProjectionLocation_ = glGetUniformLocation(uiShaderProgram_, "projection");
-  uiColorLocation_ = glGetUniformLocation(uiShaderProgram_, "color");
+  uiProjectionLocation_ = uiShaderProgram_.projectionLocation();
+  uiColorLocation_ = uiShaderProgram_.colorLocation();
 
   uiProjection_ = glm::ortho(
     0.0f,
@@ -51,7 +51,6 @@ void Renderer::initText()
 
 void Renderer::destroyText()
 {
-  if (uiShaderProgram_) glDeleteProgram(uiShaderProgram_);
   if (uiVertexBuffer_) glDeleteBuffers(1, &uiVertexBuffer_);
   if (uiVertexArray_) glDeleteVertexArrays(1, &uiVertexArray_);
 }
@@ -109,7 +108,7 @@ void Renderer::drawText(
     GL_STATIC_DRAW
   );
 
-  glUseProgram(uiShaderProgram_);
+  uiShaderProgram_.use();
 
   glUniformMatrix4fv(
     uiProjectionLocation_,

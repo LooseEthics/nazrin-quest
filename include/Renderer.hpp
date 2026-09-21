@@ -9,6 +9,7 @@
 #include "Camera.hpp"
 #include "Maze.hpp"
 #include "Mesh.hpp"
+#include "Shader.hpp"
 #include "Texture.hpp"
 
 std::string readFile(const std::string& path);
@@ -71,23 +72,13 @@ private:
   GLuint mazeVertexArray_;
   GLuint mazeVertexBuffer_;
   GLuint mazeIndexBuffer_;
-  GLuint mazeShaderProgram_;
+  Shader mazeShaderProgram_;
 
   GLint mazeProjectionLocation_;
   GLint mazeViewLocation_;
   GLint mazeTextureLocation_;
 
   glm::mat4 mazeProjection_;
-
-  GLuint compileShader(
-    GLenum type,
-    const char* source
-  ) const;
-
-  GLuint createShaderProgram(
-    const std::string& vertexShaderPath,
-    const std::string& fragmentShaderPath
-  ) const;
 
   GLsizei wallIndexCount_;
   GLsizei floorIndexCount_;
@@ -101,7 +92,7 @@ private:
 
   GLuint spriteVertexArray_;
   GLuint spriteVertexBuffer_;
-  GLuint spriteShaderProgram_;
+  Shader spriteShaderProgram_;
 
   GLint spriteProjectionLocation_;
   GLint spriteViewLocation_;
@@ -109,17 +100,17 @@ private:
 
   GLuint uiVertexArray_;
   GLuint uiVertexBuffer_;
-  GLuint uiShaderProgram_;
+  Shader uiShaderProgram_;
 
-  GLuint uiProjectionLocation_;
-  GLuint uiColorLocation_;
+  GLint uiProjectionLocation_;
+  GLint uiColorLocation_;
 
   glm::mat4 uiProjection_;
 
   Texture mapTexture_;
   GLuint mapVertexArray_;
   GLuint mapVertexBuffer_;
-  GLuint mapShaderProgram_;
+  Shader mapShaderProgram_;
 
   GLint mapProjectionLocation_;
   GLint mapTextureLocation_;
@@ -129,7 +120,7 @@ private:
 
   GLuint mapMarkerVertexArray_;
   GLuint mapMarkerVertexBuffer_;
-  GLuint mapMarkerShaderProgram_;
+  Shader mapMarkerShaderProgram_;
 
   GLint mapMarkerProjectionLocation_;
 };

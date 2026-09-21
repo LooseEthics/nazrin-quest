@@ -23,14 +23,14 @@ void Renderer::initMaze()
   glGenBuffers(1, &mazeVertexBuffer_);
   glGenBuffers(1, &mazeIndexBuffer_);
 
-  mazeShaderProgram_ = createShaderProgram(
+  mazeShaderProgram_ = Shader{
     MAZE_VERTEX_SHADER_PATH,
     MAZE_FRAGMENT_SHADER_PATH
-  );
+  };
 
-  mazeProjectionLocation_ = glGetUniformLocation(mazeShaderProgram_, "projection");
-  mazeViewLocation_ = glGetUniformLocation(mazeShaderProgram_, "view");
-  mazeTextureLocation_ = glGetUniformLocation(mazeShaderProgram_, "textureSampler");
+  mazeProjectionLocation_ = mazeShaderProgram_.projectionLocation();
+  mazeViewLocation_ = mazeShaderProgram_.viewLocation();
+  mazeTextureLocation_ = mazeShaderProgram_.textureLocation();
 
   mazeProjection_ = glm::perspective(
     glm::radians(80.0f),
@@ -71,7 +71,6 @@ void Renderer::initMaze()
 
 void Renderer::destroyMaze()
 {
-  if (mazeShaderProgram_) glDeleteProgram(mazeShaderProgram_);
   if (mazeIndexBuffer_) glDeleteBuffers(1, &mazeIndexBuffer_);
   if (mazeVertexBuffer_) glDeleteBuffers(1, &mazeVertexBuffer_);
   if (mazeVertexArray_) glDeleteVertexArrays(1, &mazeVertexArray_);
@@ -127,7 +126,7 @@ void Renderer::drawMaze(Camera& camera) const
   glBindBuffer(GL_ARRAY_BUFFER, mazeVertexBuffer_);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mazeIndexBuffer_);
 
-  glUseProgram(mazeShaderProgram_);
+  mazeShaderProgram_.use();
 
   const glm::mat4 view = camera.viewMatrix();
 

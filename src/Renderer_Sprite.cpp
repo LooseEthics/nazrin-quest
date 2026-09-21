@@ -21,14 +21,14 @@ void Renderer::initSprite()
   glGenVertexArrays(1, &spriteVertexArray_);
   glGenBuffers(1, &spriteVertexBuffer_);
 
-  spriteShaderProgram_ = createShaderProgram(
+  spriteShaderProgram_ = Shader{
     SPRITE_VERTEX_SHADER_PATH,
     SPRITE_FRAGMENT_SHADER_PATH
-  );
+  };
 
-  spriteProjectionLocation_ = glGetUniformLocation(spriteShaderProgram_, "projection");
-  spriteViewLocation_ = glGetUniformLocation(spriteShaderProgram_, "view");
-  spriteTextureLocation_ = glGetUniformLocation(spriteShaderProgram_, "textureSampler");
+  spriteProjectionLocation_ = spriteShaderProgram_.projectionLocation();
+  spriteViewLocation_ = spriteShaderProgram_.viewLocation();
+  spriteTextureLocation_ = spriteShaderProgram_.textureLocation();
 
   glBindVertexArray(spriteVertexArray_);
   glBindBuffer(GL_ARRAY_BUFFER, spriteVertexBuffer_);
@@ -60,7 +60,6 @@ void Renderer::initSprite()
 
 void Renderer::destroySprite()
 {
-  if (spriteShaderProgram_) glDeleteProgram(spriteShaderProgram_);
   if (spriteVertexBuffer_) glDeleteBuffers(1, &spriteVertexBuffer_);
   if (spriteVertexArray_) glDeleteVertexArrays(1, &spriteVertexArray_);
 }
@@ -114,7 +113,7 @@ void Renderer::drawSprite(
     GL_STATIC_DRAW
   );
 
-  glUseProgram(spriteShaderProgram_);
+  spriteShaderProgram_.use();
 
   const glm::mat4 view = camera.viewMatrix();
 
