@@ -5,8 +5,7 @@
 #include <stdexcept>
 #include <string>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include <iostream>
 
 #include "CommonGeometry.hpp"
 #include "Renderer.hpp"
@@ -33,9 +32,6 @@ Renderer::Renderer(int width, int height)
     mazeVertexBuffer_(0),
     mazeIndexBuffer_(0),
     mazeShaderProgram_(0),
-    wallTexture_(0),
-    floorTexture_(0),
-    goalTexture_(0),
     spriteVertexArray_(0),
     spriteVertexBuffer_(0),
     spriteShaderProgram_(0),
@@ -45,11 +41,11 @@ Renderer::Renderer(int width, int height)
     mapVertexArray_(0),
     mapVertexBuffer_(0),
     mapShaderProgram_(0),
-    mapTexture_(0),
     mapMarkerVertexArray_(0),
     mapMarkerVertexBuffer_(0),
     mapMarkerShaderProgram_(0)
 {
+  std::cout << "renderer\n";
   if (!SDL_Init(SDL_INIT_VIDEO)) throw std::runtime_error(SDL_GetError());
 
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -78,10 +74,15 @@ Renderer::Renderer(int width, int height)
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+  std::cout << "preinit\n";
   initMaze();
+  std::cout << "postmaze\n";
   initSprite();
+  std::cout << "postsprite\n";
   initMap();
+  std::cout << "postmap\n";
   initText();
+  std::cout << "postinit\n";
 }
 
 Renderer::~Renderer()
@@ -118,7 +119,7 @@ void Renderer::drawCamera(Camera& camera) const
 {
   drawMaze(camera);
   drawSprite(
-    goalTexture_,
+    goalTexture_.id(),
     goalPosition_,
     camera,
     CELL_SIZE / 2,
@@ -205,68 +206,4 @@ GLuint Renderer::createShaderProgram(
   }
 
   return program;
-}
-
-GLuint Renderer::loadTexture(const std::string& path) const
-{
-  int width;
-  int height;
-  int channels;
-
-  unsigned char* pixels = stbi_load(
-    path.c_str(),
-    &width,
-    &height,
-    &channels,
-    STBI_rgb_alpha
-  );
-
-  if (!pixels)
-    throw std::runtime_error("Failed to load texture: " + path);
-
-  GLuint texture;
-  glGenTextures(1, &texture);
-  glBindTexture(GL_TEXTURE_2D, texture);
-
-  glTexParameteri(
-    GL_TEXTURE_2D,
-    GL_TEXTURE_MIN_FILTER,
-    GL_NEAREST_MIPMAP_LINEAR
-  );
-
-  glTexParameteri(
-    GL_TEXTURE_2D,
-    GL_TEXTURE_MAG_FILTER,
-    GL_NEAREST
-  );
-
-  glTexParameteri(
-    GL_TEXTURE_2D,
-    GL_TEXTURE_WRAP_S,
-    GL_REPEAT
-  );
-
-  glTexParameteri(
-    GL_TEXTURE_2D,
-    GL_TEXTURE_WRAP_T,
-    GL_REPEAT
-  );
-
-  glTexImage2D(
-    GL_TEXTURE_2D,
-    0,
-    GL_RGBA8,
-    width,
-    height,
-    0,
-    GL_RGBA,
-    GL_UNSIGNED_BYTE,
-    pixels
-  );
-
-  glGenerateMipmap(GL_TEXTURE_2D);
-
-  stbi_image_free(pixels);
-
-  return texture;
 }

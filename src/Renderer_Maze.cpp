@@ -65,14 +65,12 @@ void Renderer::initMaze()
 
   glEnableVertexAttribArray(1);
 
-  wallTexture_ = loadTexture(WALL_TEXTURE_PATH);
-  floorTexture_ = loadTexture(FLOOR_TEXTURE_PATH);
+  wallTexture_ = Texture{WALL_TEXTURE_PATH};
+  floorTexture_ = Texture{FLOOR_TEXTURE_PATH};
 }
 
 void Renderer::destroyMaze()
 {
-  if (floorTexture_) glDeleteTextures(1, &floorTexture_);
-  if (wallTexture_) glDeleteTextures(1, &wallTexture_);
   if (mazeShaderProgram_) glDeleteProgram(mazeShaderProgram_);
   if (mazeIndexBuffer_) glDeleteBuffers(1, &mazeIndexBuffer_);
   if (mazeVertexBuffer_) glDeleteBuffers(1, &mazeVertexBuffer_);
@@ -150,7 +148,7 @@ void Renderer::drawMaze(Camera& camera) const
   glActiveTexture(GL_TEXTURE0);
   glUniform1i(mazeTextureLocation_, 0);
 
-  glBindTexture(GL_TEXTURE_2D, wallTexture_);
+  glBindTexture(GL_TEXTURE_2D, wallTexture_.id());
 
   glDrawElements(
     GL_TRIANGLES,
@@ -159,7 +157,7 @@ void Renderer::drawMaze(Camera& camera) const
     nullptr
   );
 
-  glBindTexture(GL_TEXTURE_2D, floorTexture_);
+  glBindTexture(GL_TEXTURE_2D, floorTexture_.id());
 
   glDrawElements(
     GL_TRIANGLES,

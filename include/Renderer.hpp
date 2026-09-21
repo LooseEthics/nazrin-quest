@@ -9,6 +9,7 @@
 #include "Camera.hpp"
 #include "Maze.hpp"
 #include "Mesh.hpp"
+#include "Texture.hpp"
 
 std::string readFile(const std::string& path);
 
@@ -93,11 +94,9 @@ private:
   GLintptr wallIndexOffset_;
   GLintptr floorIndexOffset_;
 
-  GLuint loadTexture(const std::string& path) const;
-
-  GLuint wallTexture_;
-  GLuint floorTexture_;
-  GLuint goalTexture_;
+  Texture wallTexture_;
+  Texture floorTexture_;
+  Texture goalTexture_;
   glm::vec3 goalPosition_;
 
   GLuint spriteVertexArray_;
@@ -117,7 +116,7 @@ private:
 
   glm::mat4 uiProjection_;
 
-  GLuint mapTexture_;
+  Texture mapTexture_;
   GLuint mapVertexArray_;
   GLuint mapVertexBuffer_;
   GLuint mapShaderProgram_;

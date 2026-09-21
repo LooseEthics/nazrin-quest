@@ -8,7 +8,9 @@
 Game::Game()
   : input_(std::make_unique<Input>()),
     renderer_(std::make_unique<Renderer>(1280, 720))
-{}
+{
+std::cout << "game\n";
+}
 
 void Game::run()
 {

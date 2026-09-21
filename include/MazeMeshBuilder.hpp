@@ -4,6 +4,7 @@
 #include "CommonGeometry.hpp"
 #include "Maze.hpp"
 #include "Mesh.hpp"
+#include "Vertex.hpp"
 
 // ccw from visible side
 //     4------5

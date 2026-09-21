@@ -66,6 +66,7 @@ set(SOURCES
   src/Renderer_Maze.cpp
   src/Renderer_Sprite.cpp
   src/Renderer_Text.cpp
+  src/Texture.cpp
 )
 
 add_executable(nazrin-quest ${SOURCES})

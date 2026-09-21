@@ -89,7 +89,6 @@ void Renderer::destroyMap()
   if (mapShaderProgram_) glDeleteProgram(mapShaderProgram_);
   if (mapVertexBuffer_) glDeleteBuffers(1, &mapVertexBuffer_);
   if (mapVertexArray_) glDeleteVertexArrays(1, &mapVertexArray_);
-  if (mapTexture_) glDeleteTextures(1, &mapTexture_);
 }
 
 void Renderer::createMapTexture(const Maze& maze)
@@ -114,44 +113,7 @@ void Renderer::createMapTexture(const Maze& maze)
     }
   }
 
-  glGenTextures(1, &mapTexture_);
-  glBindTexture(GL_TEXTURE_2D, mapTexture_);
-
-  glTexParameteri(
-    GL_TEXTURE_2D,
-    GL_TEXTURE_MIN_FILTER,
-    GL_NEAREST
-  );
-
-  glTexParameteri(
-    GL_TEXTURE_2D,
-    GL_TEXTURE_MAG_FILTER,
-    GL_NEAREST
-  );
-
-  glTexParameteri(
-    GL_TEXTURE_2D,
-    GL_TEXTURE_WRAP_S,
-    GL_CLAMP_TO_EDGE
-  );
-
-  glTexParameteri(
-    GL_TEXTURE_2D,
-    GL_TEXTURE_WRAP_T,
-    GL_CLAMP_TO_EDGE
-  );
-
-  glTexImage2D(
-    GL_TEXTURE_2D,
-    0,
-    GL_RGBA8,
-    mapWidth_,
-    mapHeight_,
-    0,
-    GL_RGBA,
-    GL_UNSIGNED_BYTE,
-    pixels.data()
-  );
+  mapTexture_ = Texture{pixels, mapWidth_, mapHeight_, 4};
 
   setGoalPosition(maze.getGoalCoords());
 }
@@ -230,7 +192,7 @@ void Renderer::drawMap(glm::vec3 pos, float yaw) const
   );
 
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, mapTexture_);
+  glBindTexture(GL_TEXTURE_2D, mapTexture_.id());
 
   glUniform1i(mapTextureLocation_, 0);
 

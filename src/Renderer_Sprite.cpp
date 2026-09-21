@@ -55,12 +55,11 @@ void Renderer::initSprite()
 
   glEnableVertexAttribArray(1);
 
-  goalTexture_ = loadTexture(GOAL_TEXTURE_PATH);
+  goalTexture_ = Texture{GOAL_TEXTURE_PATH};
 }
 
 void Renderer::destroySprite()
 {
-  if (goalTexture_) glDeleteTextures(1, &goalTexture_);
   if (spriteShaderProgram_) glDeleteProgram(spriteShaderProgram_);
   if (spriteVertexBuffer_) glDeleteBuffers(1, &spriteVertexBuffer_);
   if (spriteVertexArray_) glDeleteVertexArrays(1, &spriteVertexArray_);
