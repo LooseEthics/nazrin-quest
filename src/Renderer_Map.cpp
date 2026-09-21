@@ -49,6 +49,14 @@ void Renderer::initMap()
   glEnableVertexAttribArray(1);
 }
 
+void Renderer::destroyMap()
+{
+  if (mapShaderProgram_) glDeleteProgram(mapShaderProgram_);
+  if (mapVertexBuffer_) glDeleteBuffers(1, &mapVertexBuffer_);
+  if (mapVertexArray_) glDeleteVertexArrays(1, &mapVertexArray_);
+  if (mapTexture_) glDeleteTextures(1, &mapTexture_);
+}
+
 void Renderer::createMapTexture(const Maze& maze)
 {
   mapWidth_ = maze.width();

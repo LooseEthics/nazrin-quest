@@ -12,6 +12,8 @@ namespace
 {
   constexpr const char* SPRITE_VERTEX_SHADER_PATH = "shaders/sprite.vert";
   constexpr const char* SPRITE_FRAGMENT_SHADER_PATH = "shaders/sprite.frag";
+
+  constexpr const char* GOAL_TEXTURE_PATH = "assets/cheese.png";
 }
 
 void Renderer::initSprite()
@@ -49,6 +51,16 @@ void Renderer::initSprite()
   );
 
   glEnableVertexAttribArray(1);
+
+  goalTexture_ = loadTexture(GOAL_TEXTURE_PATH);
+}
+
+void Renderer::destroySprite()
+{
+  if (goalTexture_) glDeleteTextures(1, &goalTexture_);
+  if (spriteShaderProgram_) glDeleteProgram(spriteShaderProgram_);
+  if (spriteVertexBuffer_) glDeleteBuffers(1, &spriteVertexBuffer_);
+  if (spriteVertexArray_) glDeleteVertexArrays(1, &spriteVertexArray_);
 }
 
 void Renderer::drawSprite(

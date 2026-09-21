@@ -12,6 +12,9 @@ namespace
 {
   constexpr const char* MAZE_VERTEX_SHADER_PATH = "shaders/maze.vert";
   constexpr const char* MAZE_FRAGMENT_SHADER_PATH = "shaders/maze.frag";
+
+  constexpr const char* WALL_TEXTURE_PATH = "assets/tex_wall.png";
+  constexpr const char* FLOOR_TEXTURE_PATH = "assets/tex_floor.png";
 }
 
 void Renderer::initMaze()
@@ -58,6 +61,19 @@ void Renderer::initMaze()
   );
 
   glEnableVertexAttribArray(1);
+
+  wallTexture_ = loadTexture(WALL_TEXTURE_PATH);
+  floorTexture_ = loadTexture(FLOOR_TEXTURE_PATH);
+}
+
+void Renderer::destroyMaze()
+{
+  if (floorTexture_) glDeleteTextures(1, &floorTexture_);
+  if (wallTexture_) glDeleteTextures(1, &wallTexture_);
+  if (mazeShaderProgram_) glDeleteProgram(mazeShaderProgram_);
+  if (mazeIndexBuffer_) glDeleteBuffers(1, &mazeIndexBuffer_);
+  if (mazeVertexBuffer_) glDeleteBuffers(1, &mazeVertexBuffer_);
+  if (mazeVertexArray_) glDeleteVertexArrays(1, &mazeVertexArray_);
 }
 
 void Renderer::uploadMesh(const Mesh& mesh)

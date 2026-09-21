@@ -24,11 +24,6 @@ public:
   Renderer(const Renderer&) = delete;
   Renderer& operator=(const Renderer&) = delete;
 
-  void initMap();
-  void initMaze();
-  void initSprite();
-  void initText();
-
   void clear() const;
   void drawCamera(Camera& camera) const;
   void drawMaze(Camera& camera) const;
@@ -56,6 +51,16 @@ public:
   SDL_Window* window() const;
 
 private:
+  void initMap();
+  void initMaze();
+  void initSprite();
+  void initText();
+
+  void destroyMap();
+  void destroyMaze();
+  void destroySprite();
+  void destroyText();
+
   uint32_t width_;
   uint32_t height_;
 

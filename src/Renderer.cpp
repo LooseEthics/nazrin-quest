@@ -75,32 +75,15 @@ Renderer::Renderer(int width, int height)
   initSprite();
   initMap();
   initText();
-
-  wallTexture_ = loadTexture("assets/tex_wall.png");
-  floorTexture_ = loadTexture("assets/tex_floor.png");
-  goalTexture_ = loadTexture("assets/cheese.png");
 }
 
 Renderer::~Renderer()
 {
-  if (uiShaderProgram_) glDeleteProgram(uiShaderProgram_);
-  if (uiVertexBuffer_) glDeleteBuffers(1, &uiVertexBuffer_);
-  if (uiVertexArray_) glDeleteVertexArrays(1, &uiVertexArray_);
-
-  if (goalTexture_) glDeleteTextures(1, &goalTexture_);
-  if (floorTexture_) glDeleteTextures(1, &floorTexture_);
-  if (wallTexture_) glDeleteTextures(1, &wallTexture_);
-
-  if (mapShaderProgram_) glDeleteProgram(mapShaderProgram_);
-  if (mapVertexBuffer_) glDeleteBuffers(1, &mapVertexBuffer_);
-  if (mapVertexArray_) glDeleteVertexArrays(1, &mapVertexArray_);
-  if (mapTexture_) glDeleteTextures(1, &mapTexture_);
-
-  if (mazeShaderProgram_) glDeleteProgram(mazeShaderProgram_);
-  if (mazeIndexBuffer_) glDeleteBuffers(1, &mazeIndexBuffer_);
-  if (mazeVertexBuffer_) glDeleteBuffers(1, &mazeVertexBuffer_);
-  if (mazeVertexArray_) glDeleteVertexArrays(1, &mazeVertexArray_);
-
+  destroyText();
+  destroyMap();
+  destroySprite();
+  destroyMaze();
+  
   if (context_) SDL_GL_DestroyContext(context_);
   if (window_) SDL_DestroyWindow(window_);
 

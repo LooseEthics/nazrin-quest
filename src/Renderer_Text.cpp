@@ -46,6 +46,13 @@ void Renderer::initText()
   glEnableVertexAttribArray(0);
 }
 
+void Renderer::destroyText()
+{
+  if (uiShaderProgram_) glDeleteProgram(uiShaderProgram_);
+  if (uiVertexBuffer_) glDeleteBuffers(1, &uiVertexBuffer_);
+  if (uiVertexArray_) glDeleteVertexArrays(1, &uiVertexArray_);
+}
+
 void Renderer::drawText(
   const std::string& text,
   const glm::vec2& position,
