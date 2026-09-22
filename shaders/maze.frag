@@ -7,8 +7,7 @@ uniform sampler2D textureSampler;
 
 out vec4 fragmentColor;
 
-uniform vec3 color;
-
-void main(){
+void main()
+{
   fragmentColor = texture(textureSampler, fragTexCoord);
 }

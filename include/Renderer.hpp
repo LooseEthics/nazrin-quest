@@ -3,10 +3,12 @@
 
 #include <glad/gl.h>
 #include <glm/mat4x4.hpp>
+#include <memory>
 #include <SDL3/SDL.h>
 #include <string>
 
 #include "Camera.hpp"
+#include "MapRenderer.hpp"
 #include "Maze.hpp"
 #include "Mesh.hpp"
 #include "Shader.hpp"
@@ -51,20 +53,19 @@ public:
 
   [[nodiscard]]
   SDL_Window* window() const;
+  MapRenderer& mapRenderer() const;
 
 private:
-  void initMap();
   void initMaze();
   void initSprite();
   void initText();
 
-  void destroyMap();
   void destroyMaze();
   void destroySprite();
   void destroyText();
 
-  uint32_t width_;
-  uint32_t height_;
+  uint32_t windowWidth_;
+  uint32_t windowHeight_;
 
   SDL_Window* window_;
   SDL_GLContext context_;
@@ -107,20 +108,5 @@ private:
 
   glm::mat4 uiProjection_;
 
-  Texture mapTexture_;
-  GLuint mapVertexArray_;
-  GLuint mapVertexBuffer_;
-  Shader mapShaderProgram_;
-
-  GLint mapProjectionLocation_;
-  GLint mapTextureLocation_;
-
-  int mapWidth_;
-  int mapHeight_;
-
-  GLuint mapMarkerVertexArray_;
-  GLuint mapMarkerVertexBuffer_;
-  Shader mapMarkerShaderProgram_;
-
-  GLint mapMarkerProjectionLocation_;
+  std::unique_ptr<MapRenderer> mapRenderer_ = nullptr;
 };

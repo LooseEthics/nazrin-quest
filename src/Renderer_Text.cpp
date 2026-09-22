@@ -29,8 +29,8 @@ void Renderer::initText()
 
   uiProjection_ = glm::ortho(
     0.0f,
-    static_cast<float>(width_),
-    static_cast<float>(height_),
+    static_cast<float>(windowWidth_),
+    static_cast<float>(windowHeight_),
     0.0f
   );
 

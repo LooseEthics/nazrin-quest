@@ -1,11 +1,8 @@
 
 #include <array>
-#include <glad/gl.h>
 #include <glm/gtc/type_ptr.hpp>
-#include <vector>
 
-#include "Maze.hpp"
-#include "Renderer.hpp"
+#include "MapRenderer.hpp"
 
 namespace
 {
@@ -16,7 +13,15 @@ namespace
 
 }
 
-void Renderer::initMap()
+MapRenderer::MapRenderer(uint32_t width, uint32_t height)
+  : windowWidth_(width),
+    windowHeight_(height),
+    mapProjection_(glm::ortho(
+      0.0f,
+      static_cast<float>(windowWidth_),
+      static_cast<float>(windowHeight_),
+      0.0f
+    ))
 {
   // map itself
   glGenVertexArrays(1, &mapVertexArray_);
@@ -79,9 +84,11 @@ void Renderer::initMap()
   );
 
   glEnableVertexAttribArray(0);
+
+
 }
 
-void Renderer::destroyMap()
+MapRenderer::~MapRenderer()
 {
   if (mapMarkerVertexBuffer_) glDeleteBuffers(1, &mapMarkerVertexBuffer_);
   if (mapMarkerVertexArray_) glDeleteVertexArrays(1, &mapMarkerVertexArray_);
@@ -89,7 +96,7 @@ void Renderer::destroyMap()
   if (mapVertexArray_) glDeleteVertexArrays(1, &mapVertexArray_);
 }
 
-void Renderer::createMapTexture(const Maze& maze)
+void MapRenderer::createMapTexture(const Maze& maze)
 {
   mapWidth_ = maze.width();
   mapHeight_ = maze.height();
@@ -107,21 +114,19 @@ void Renderer::createMapTexture(const Maze& maze)
         pixels[i + 1] = 255;
         pixels[i + 2] = 255;
         pixels[i + 3] = 255;
+      } else if (Maze::Coord{x, z} == maze.getGoal()) {
+        pixels[i + 0] = 0;
+        pixels[i + 1] = 255;
+        pixels[i + 2] = 0;
+        pixels[i + 3] = 255;
       }
     }
   }
 
   mapTexture_ = Texture{pixels, mapWidth_, mapHeight_, 4};
-
-  setGoalPosition(maze.getGoalCoords());
 }
 
-void Renderer::setGoalPosition(const glm::vec3 position)
-{
-  goalPosition_ = position;
-}
-
-void Renderer::drawMap(glm::vec3 pos, float yaw) const
+void MapRenderer::drawMap(glm::vec3 pos, float yaw) const
 {
   constexpr float margin = 50.0f;
   constexpr float mapMaxSize = 600.0f;
@@ -135,8 +140,8 @@ void Renderer::drawMap(glm::vec3 pos, float yaw) const
   const int mapWidth = mapWidth_ * scale;
   const int mapHeight = mapHeight_ * scale;
 
-  const float x0 = (width_ - mapWidth) * 0.5f;
-  const float y0 = (height_ - mapHeight) * 0.5f;
+  const float x0 = (windowWidth_ - mapWidth) * 0.5f;
+  const float y0 = (windowHeight_ - mapHeight) * 0.5f;
   const float x1 = x0 + mapWidth;
   const float y1 = y0 + mapHeight;
 
@@ -186,7 +191,7 @@ void Renderer::drawMap(glm::vec3 pos, float yaw) const
     mapProjectionLocation_,
     1,
     GL_FALSE,
-    glm::value_ptr(uiProjection_)
+    glm::value_ptr(mapProjection_)
   );
 
   glActiveTexture(GL_TEXTURE0);
@@ -243,7 +248,7 @@ void Renderer::drawMap(glm::vec3 pos, float yaw) const
     mapMarkerProjectionLocation_,
     1,
     GL_FALSE,
-    glm::value_ptr(uiProjection_)
+    glm::value_ptr(mapProjection_)
   );
 
   glDrawArrays(
@@ -252,6 +257,17 @@ void Renderer::drawMap(glm::vec3 pos, float yaw) const
     3
   );
 
-
   glEnable(GL_DEPTH_TEST);
+}
+
+void MapRenderer::setWindowDimensions(uint32_t width, uint32_t height)
+{
+  windowWidth_ = width;
+  windowHeight_ = height;
+  mapProjection_ = glm::ortho(
+    0.0f,
+    static_cast<float>(windowWidth_),
+    static_cast<float>(windowHeight_),
+    0.0f
+  );
 }

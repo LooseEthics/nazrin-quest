@@ -10,8 +10,8 @@
 #include "Renderer.hpp"
 
 Renderer::Renderer(int width, int height)
-  : width_(width),
-    height_(height),
+  : windowWidth_(width),
+    windowHeight_(height),
     window_(nullptr),
     context_(nullptr),
     mazeVertexArray_(0),
@@ -20,11 +20,7 @@ Renderer::Renderer(int width, int height)
     spriteVertexArray_(0),
     spriteVertexBuffer_(0),
     uiVertexArray_(0),
-    uiVertexBuffer_(0),
-    mapVertexArray_(0),
-    mapVertexBuffer_(0),
-    mapMarkerVertexArray_(0),
-    mapMarkerVertexBuffer_(0)
+    uiVertexBuffer_(0)
 {
   if (!SDL_Init(SDL_INIT_VIDEO)) throw std::runtime_error(SDL_GetError());
 
@@ -34,8 +30,8 @@ Renderer::Renderer(int width, int height)
 
   window_ = SDL_CreateWindow(
     "Nazrin Quest",
-    width_,
-    height_,
+    windowWidth_,
+    windowHeight_,
     SDL_WINDOW_OPENGL
   );
   if (!window_) throw std::runtime_error(SDL_GetError());
@@ -49,21 +45,20 @@ Renderer::Renderer(int width, int height)
   if (!gladLoadGL(reinterpret_cast<GLADloadfunc>(SDL_GL_GetProcAddress)))
     throw std::runtime_error("Failed to initialize OpenGL");
 
-  glViewport(0, 0, width_, height_);
+  glViewport(0, 0, windowWidth_, windowHeight_);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+  mapRenderer_ = std::make_unique<MapRenderer>(windowWidth_, windowHeight_);
   initMaze();
   initSprite();
-  initMap();
   initText();
 }
 
 Renderer::~Renderer()
 {
   destroyText();
-  destroyMap();
   destroySprite();
   destroyMaze();
 
@@ -85,11 +80,6 @@ void Renderer::clear() const
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Renderer::present() const
-{
-  SDL_GL_SwapWindow(window_);
-}
-
 void Renderer::drawCamera(Camera& camera) const
 {
   drawMaze(camera);
@@ -102,7 +92,19 @@ void Renderer::drawCamera(Camera& camera) const
   );
 }
 
+void Renderer::present() const
+{
+  SDL_GL_SwapWindow(window_);
+}
+
+void Renderer::setGoalPosition(const glm::vec3 position)
+{
+  goalPosition_ = position;
+}
+
 SDL_Window* Renderer::window() const
 {
   return window_;
 }
+
+MapRenderer& Renderer::mapRenderer() const {return *mapRenderer_;}

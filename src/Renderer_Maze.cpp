@@ -34,7 +34,7 @@ void Renderer::initMaze()
 
   mazeProjection_ = glm::perspective(
     glm::radians(80.0f),
-    static_cast<float>(width_) / static_cast<float>(height_),
+    static_cast<float>(windowWidth_) / static_cast<float>(windowHeight_),
     0.01f,
     500.0f
   );
