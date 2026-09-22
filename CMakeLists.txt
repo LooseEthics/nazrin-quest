@@ -52,23 +52,23 @@ FetchContent_MakeAvailable(glm)
 
 set(SOURCES
   src/main.cpp
-  src/Maze.cpp
-  src/MazeGenerator.cpp
-  src/LogicMaze.cpp
-  src/MazeMeshBuilder.cpp
-  src/Renderer.cpp
-  src/Camera.cpp
-  src/Player.cpp
-  src/Input.cpp
   src/CommonGeometry.cpp
   src/Game.cpp
-  src/Texture.cpp
-  src/Shader.cpp
-  src/MapRenderer.cpp
-  src/MazeRenderer.cpp
-  src/SubRendererBase.cpp
-  src/SpriteRenderer.cpp
-  src/TextRenderer.cpp
+  src/Input.cpp
+  src/LogicMaze.cpp
+  src/Maze.cpp
+  src/MazeGenerator.cpp
+  src/MazeMeshBuilder.cpp
+  src/Player.cpp
+  src/renderer/Camera.cpp
+  src/renderer/MapRenderer.cpp
+  src/renderer/MazeRenderer.cpp
+  src/renderer/Renderer.cpp
+  src/renderer/Shader.cpp
+  src/renderer/SpriteRenderer.cpp
+  src/renderer/SubRendererBase.cpp
+  src/renderer/TextRenderer.cpp
+  src/renderer/Texture.cpp
 )
 
 add_executable(nazrin-quest ${SOURCES})
@@ -76,6 +76,7 @@ add_executable(nazrin-quest ${SOURCES})
 target_include_directories(nazrin-quest
   PRIVATE
   include
+  include/renderer
   ${stb_SOURCE_DIR}
 )
 
