@@ -23,9 +23,10 @@ namespace
 }
 
 MazeRenderer::MazeRenderer(uint32_t width, uint32_t height)
-  : windowWidth_(width),
-    windowHeight_(height)
+  : SubRendererBase(width, height)
 {
+  calculateProjection();
+
   glGenVertexArrays(1, &mazeVertexArray_);
   glGenBuffers(1, &mazeVertexBuffer_);
   glGenBuffers(1, &mazeIndexBuffer_);
@@ -173,10 +174,8 @@ void MazeRenderer::drawMaze(Camera& camera) const
   );
 }
 
-void MazeRenderer::setWindowDimensions(uint32_t width, uint32_t height)
+void MazeRenderer::calculateProjection()
 {
-  windowWidth_ = width;
-  windowHeight_ = height;
   mazeProjection_ = glm::perspective(
     glm::radians(FOV),
     static_cast<float>(windowWidth_) / static_cast<float>(windowHeight_),

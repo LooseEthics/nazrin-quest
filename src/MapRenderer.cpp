@@ -10,19 +10,13 @@ namespace
   constexpr const char* MAP_FRAGMENT_SHADER_PATH = "shaders/map.frag";
   constexpr const char* MAP_MARKER_VERTEX_SHADER_PATH = "shaders/map_marker.vert";
   constexpr const char* MAP_MARKER_FRAGMENT_SHADER_PATH = "shaders/map_marker.frag";
-
 }
 
 MapRenderer::MapRenderer(uint32_t width, uint32_t height)
-  : windowWidth_(width),
-    windowHeight_(height),
-    mapProjection_(glm::ortho(
-      0.0f,
-      static_cast<float>(windowWidth_),
-      static_cast<float>(windowHeight_),
-      0.0f
-    ))
+  : SubRendererBase(width, height)
 {
+  calculateProjection();
+
   // map itself
   glGenVertexArrays(1, &mapVertexArray_);
   glGenBuffers(1, &mapVertexBuffer_);
@@ -260,10 +254,8 @@ void MapRenderer::drawMap(glm::vec3 pos, float yaw) const
   glEnable(GL_DEPTH_TEST);
 }
 
-void MapRenderer::setWindowDimensions(uint32_t width, uint32_t height)
+void MapRenderer::calculateProjection()
 {
-  windowWidth_ = width;
-  windowHeight_ = height;
   mapProjection_ = glm::ortho(
     0.0f,
     static_cast<float>(windowWidth_),

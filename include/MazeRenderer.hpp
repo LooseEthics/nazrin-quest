@@ -7,9 +7,10 @@
 #include "Camera.hpp"
 #include "Mesh.hpp"
 #include "Shader.hpp"
+#include "SubRendererBase.hpp"
 #include "Texture.hpp"
 
-class MazeRenderer
+class MazeRenderer : public SubRendererBase
 {
 public:
   MazeRenderer(uint32_t width, uint32_t height);
@@ -19,11 +20,8 @@ public:
 
   void uploadMesh(const Mesh& mesh);
 
-  void setWindowDimensions(uint32_t width, uint32_t height);
-
 private:
-  uint32_t windowWidth_;
-  uint32_t windowHeight_;
+  void calculateProjection() override;
 
   GLuint mazeVertexArray_;
   GLuint mazeVertexBuffer_;

@@ -68,6 +68,7 @@ set(SOURCES
   src/Shader.cpp
   src/MapRenderer.cpp
   src/MazeRenderer.cpp
+  src/SubRendererBase.cpp
 )
 
 add_executable(nazrin-quest ${SOURCES})

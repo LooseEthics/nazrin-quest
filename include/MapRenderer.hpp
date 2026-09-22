@@ -5,9 +5,10 @@
 
 #include "Maze.hpp"
 #include "Shader.hpp"
+#include "SubRendererBase.hpp"
 #include "Texture.hpp"
 
-class MapRenderer
+class MapRenderer : public SubRendererBase
 {
 public:
   MapRenderer(uint32_t width, uint32_t height);
@@ -17,11 +18,8 @@ public:
 
   void createMapTexture(const Maze& maze);
 
-  void setWindowDimensions(uint32_t width, uint32_t height);
-
 private:
-  uint32_t windowWidth_;
-  uint32_t windowHeight_;
+  void calculateProjection() override;
 
   Texture mapTexture_;
   GLuint mapVertexArray_;
