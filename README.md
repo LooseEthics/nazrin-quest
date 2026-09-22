@@ -12,6 +12,7 @@ The goal is to find the cheese.
 * Mouse-look camera
 * Player movement and wall collision
 * Configurable maze parameters
+* In-game map with position tracking
 
 ## Requirements
 
@@ -63,7 +64,6 @@ Prototype / technical test.
 
 ## Planned features
 
-* In-game map
 * Glass maze
 * Mirror maze
 * First person player model
