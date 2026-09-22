@@ -129,7 +129,7 @@ void Game::renderConfig()
 
   renderer_->clear();
   for (int i = 0; i < configText.size(); ++i){
-    renderer_->drawText(
+    renderer_->textRenderer().drawText(
       configText[i],
       glm::vec2{100.0f, i * 100.0f},
       8.0f,
@@ -158,7 +158,7 @@ void Game::renderWon()
 
   renderer_->clear();
   for (int i = 0; i < winText.size(); ++i){
-    renderer_->drawText(
+    renderer_->textRenderer().drawText(
       winText[i],
       glm::vec2{100.0f, i * 100.0f},
       8.0f,

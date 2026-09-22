@@ -12,6 +12,7 @@
 #include "MazeRenderer.hpp"
 #include "Shader.hpp"
 #include "SpriteRenderer.hpp"
+#include "TextRenderer.hpp"
 #include "Texture.hpp"
 
 class Renderer
@@ -28,12 +29,6 @@ public:
 
   void clear() const;
   void drawCamera(Camera& camera) const;
-  void drawText(
-    const std::string& text,
-    const glm::vec2& position,
-    float scale,
-    const glm::vec3& color
-  ) const;
   void present() const;
 
   [[nodiscard]]
@@ -41,6 +36,7 @@ public:
   MapRenderer& mapRenderer() const;
   MazeRenderer& mazeRenderer() const;
   SpriteRenderer& spriteRenderer() const;
+  TextRenderer& textRenderer() const;
 
 private:
   void initText();
@@ -55,15 +51,6 @@ private:
 
   std::unique_ptr<MazeRenderer> mazeRenderer_ = nullptr;
   std::unique_ptr<SpriteRenderer> spriteRenderer_ = nullptr;
-
-  GLuint uiVertexArray_;
-  GLuint uiVertexBuffer_;
-  Shader uiShaderProgram_;
-
-  GLint uiProjectionLocation_;
-  GLint uiColorLocation_;
-
-  glm::mat4 uiProjection_;
-
+  std::unique_ptr<TextRenderer> textRenderer_ = nullptr;
   std::unique_ptr<MapRenderer> mapRenderer_ = nullptr;
 };

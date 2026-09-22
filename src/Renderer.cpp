@@ -13,9 +13,7 @@ Renderer::Renderer(int width, int height)
   : windowWidth_(width),
     windowHeight_(height),
     window_(nullptr),
-    context_(nullptr),
-    uiVertexArray_(0),
-    uiVertexBuffer_(0)
+    context_(nullptr)
 {
   if (!SDL_Init(SDL_INIT_VIDEO)) throw std::runtime_error(SDL_GetError());
 
@@ -48,12 +46,11 @@ Renderer::Renderer(int width, int height)
   mapRenderer_ = std::make_unique<MapRenderer>(windowWidth_, windowHeight_);
   mazeRenderer_ = std::make_unique<MazeRenderer>(windowWidth_, windowHeight_);
   spriteRenderer_ = std::make_unique<SpriteRenderer>(windowWidth_, windowHeight_);
-  initText();
+  textRenderer_ = std::make_unique<TextRenderer>(windowWidth_, windowHeight_);
 }
 
 Renderer::~Renderer()
 {
-  destroyText();
 
   if (context_) SDL_GL_DestroyContext(context_);
   if (window_) SDL_DestroyWindow(window_);
@@ -98,3 +95,4 @@ SDL_Window* Renderer::window() const
 MapRenderer& Renderer::mapRenderer() const {return *mapRenderer_;}
 MazeRenderer& Renderer::mazeRenderer() const {return *mazeRenderer_;}
 SpriteRenderer& Renderer::spriteRenderer() const {return *spriteRenderer_;}
+TextRenderer& Renderer::textRenderer() const {return *textRenderer_;}

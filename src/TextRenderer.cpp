@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "Glyphs.hpp"
-#include "Renderer.hpp"
+#include "TextRenderer.hpp"
 
 namespace
 {
@@ -14,8 +14,11 @@ namespace
   constexpr const char* UI_FRAGMENT_SHADER_PATH = "shaders/ui.frag";
 }
 
-void Renderer::initText()
+TextRenderer::TextRenderer(uint32_t width, uint32_t height)
+  : SubRendererBase(width, height)
 {
+  calculateProjection();
+
   glGenVertexArrays(1, &uiVertexArray_);
   glGenBuffers(1, &uiVertexBuffer_);
 
@@ -49,13 +52,13 @@ void Renderer::initText()
   glEnableVertexAttribArray(0);
 }
 
-void Renderer::destroyText()
+TextRenderer::~TextRenderer()
 {
   if (uiVertexBuffer_) glDeleteBuffers(1, &uiVertexBuffer_);
   if (uiVertexArray_) glDeleteVertexArrays(1, &uiVertexArray_);
 }
 
-void Renderer::drawText(
+void TextRenderer::drawText(
   const std::string& text,
   const glm::vec2& position,
   float scale,
@@ -128,4 +131,10 @@ void Renderer::drawText(
     0,
     static_cast<GLsizei>(vertices.size())
   );
+}
+
+void TextRenderer::calculateProjection()
+{
+  // nothing
+  ;
 }
