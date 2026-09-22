@@ -28,7 +28,6 @@ public:
   Renderer& operator=(const Renderer&) = delete;
 
   void clear() const;
-  void drawCamera(Camera& camera) const;
   void present() const;
 
   [[nodiscard]]

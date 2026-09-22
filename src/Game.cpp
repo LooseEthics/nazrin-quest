@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "Game.hpp"
+#include "GoalEntity.hpp"
 #include "MazeGenerator.hpp"
 #include "MazeMeshBuilder.hpp"
 
@@ -102,6 +103,8 @@ void Game::updateConfig(float deltaTime)
 void Game::updatePlaying(float deltaTime)
 {
   player_->update(*input_, deltaTime);
+  for (auto& entity : entities_)
+    entity->update(deltaTime);
 
   mapVisible_ = input_->mapTrigger();
 
@@ -142,8 +145,17 @@ void Game::renderConfig()
 void Game::renderPlaying()
 {
   renderer_->clear();
-  if (!mapVisible_)
-    renderer_->drawCamera(player_->camera());
+  if (!mapVisible_){
+    renderer_->mazeRenderer().drawMaze(player_->camera());
+    for (auto& entity : entities_)
+      renderer_->spriteRenderer().drawSprite(
+        entity->sprite(),
+        entity->position(),
+        player_->camera(),
+        entity->width(),
+        entity->height()
+      );
+  }
   else
     renderer_->mapRenderer().drawMap(player_->pos(), player_->yaw());
   renderer_->present();
@@ -209,9 +221,10 @@ void Game::startGame()
 
   player_ = std::make_unique<Player>(*maze_);
 
+  entities_.push_back(std::make_unique<GoalEntity>(maze_->getGoalCoords()));
+
   renderer_->mazeRenderer().uploadMesh(*mesh_);
   renderer_->mapRenderer().createMapTexture(*maze_);
-  renderer_->spriteRenderer().setGoalPosition(maze_->getGoalCoords());
 
   mapVisible_ = false;
   state_ = GameState::Playing;

@@ -60,6 +60,7 @@ SpriteRenderer::SpriteRenderer(uint32_t width, uint32_t height)
   glEnableVertexAttribArray(1);
 
   goalTexture_ = Texture{GOAL_TEXTURE_PATH};
+  sprites_.insert({SpriteId::Cheese, &goalTexture_});
 }
 
 SpriteRenderer::~SpriteRenderer()
@@ -69,7 +70,7 @@ SpriteRenderer::~SpriteRenderer()
 }
 
 void SpriteRenderer::drawSprite(
-  const Texture& texture,
+  SpriteId sprite,
   const glm::vec3& position,
   const Camera& camera,
   float width,
@@ -135,6 +136,8 @@ void SpriteRenderer::drawSprite(
     glm::value_ptr(view)
   );
 
+  const Texture& texture = *sprites_.at(sprite);
+
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture.id());
 
@@ -149,11 +152,6 @@ void SpriteRenderer::drawSprite(
   );
 
   glDepthMask(GL_TRUE);
-}
-
-void SpriteRenderer::setGoalPosition(const glm::vec3 position)
-{
-  goalPosition_ = position;
 }
 
 void SpriteRenderer::calculateProjection()

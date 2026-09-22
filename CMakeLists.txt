@@ -60,6 +60,8 @@ set(SOURCES
   src/MazeGenerator.cpp
   src/MazeMeshBuilder.cpp
   src/Player.cpp
+  src/entities/Entity.cpp
+  src/entities/GoalEntity.cpp
   src/renderer/Camera.cpp
   src/renderer/MapRenderer.cpp
   src/renderer/MazeRenderer.cpp
@@ -76,6 +78,7 @@ add_executable(nazrin-quest ${SOURCES})
 target_include_directories(nazrin-quest
   PRIVATE
   include
+  include/entities
   include/renderer
   ${stb_SOURCE_DIR}
 )

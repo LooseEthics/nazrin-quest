@@ -9,7 +9,13 @@
 Texture::Texture()
   : id_(0) {}
 
+
 Texture::Texture(const std::string& path)
+  : Texture(SpriteId::Default, path)
+{}
+
+Texture::Texture(SpriteId sid, const std::string& path)
+  : sid_(sid)
 {
   int width;
   int height;
@@ -69,6 +75,7 @@ Texture::Texture(const std::string& path)
 
   stbi_image_free(pixels);
 }
+
 
 Texture::Texture(
   const std::vector<unsigned char>& pixels,

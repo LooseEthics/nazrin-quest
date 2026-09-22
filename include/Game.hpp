@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <memory>
 
+#include "Entity.hpp"
 #include "Input.hpp"
 #include "Maze.hpp"
 #include "Mesh.hpp"
@@ -82,4 +83,6 @@ private:
 
   bool mapVisible_ = false;
   float winTime_ = 0.0f;
+
+  std::vector<std::unique_ptr<Entity>> entities_;
 };

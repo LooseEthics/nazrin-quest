@@ -70,18 +70,6 @@ void Renderer::clear() const
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void Renderer::drawCamera(Camera& camera) const
-{
-  mazeRenderer_->drawMaze(camera);
-  spriteRenderer_->drawSprite(
-    spriteRenderer_->goalTexture_,
-    spriteRenderer_->goalPosition_,
-    camera,
-    CELL_SIZE / 2,
-    CELL_SIZE / 2
-  );
-}
-
 void Renderer::present() const
 {
   SDL_GL_SwapWindow(window_);

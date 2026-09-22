@@ -5,11 +5,14 @@
 #include <string>
 #include <vector>
 
+#include "SpriteId.hpp"
+
 class Texture
 {
 public:
   Texture();
   explicit Texture(const std::string& path);
+  explicit Texture(SpriteId sid, const std::string& path);
   Texture(
     const std::vector<unsigned char>& pixels,
     int width,
@@ -28,4 +31,5 @@ public:
 
 private:
   GLuint id_ = 0;
+  SpriteId sid_;
 };
