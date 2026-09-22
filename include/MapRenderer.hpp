@@ -13,8 +13,9 @@ public:
   MapRenderer(uint32_t width, uint32_t height);
   ~MapRenderer();
 
-  void createMapTexture(const Maze& maze);
   void drawMap(glm::vec3 pos, float yaw) const;
+
+  void createMapTexture(const Maze& maze);
 
   void setWindowDimensions(uint32_t width, uint32_t height);
 

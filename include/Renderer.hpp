@@ -9,8 +9,7 @@
 
 #include "Camera.hpp"
 #include "MapRenderer.hpp"
-#include "Maze.hpp"
-#include "Mesh.hpp"
+#include "MazeRenderer.hpp"
 #include "Shader.hpp"
 #include "Texture.hpp"
 
@@ -30,7 +29,6 @@ public:
 
   void clear() const;
   void drawCamera(Camera& camera) const;
-  void drawMaze(Camera& camera) const;
   void drawText(
     const std::string& text,
     const glm::vec2& position,
@@ -44,16 +42,14 @@ public:
     float width,
     float height
   ) const;
-  void drawMap(glm::vec3 pos, float yaw) const;
   void present() const;
 
-  void uploadMesh(const Mesh& mesh);
-  void createMapTexture(const Maze& maze);
   void setGoalPosition(const glm::vec3 position);
 
   [[nodiscard]]
   SDL_Window* window() const;
   MapRenderer& mapRenderer() const;
+  MazeRenderer& mazeRenderer() const;
 
 private:
   void initMaze();
@@ -70,24 +66,8 @@ private:
   SDL_Window* window_;
   SDL_GLContext context_;
 
-  GLuint mazeVertexArray_;
-  GLuint mazeVertexBuffer_;
-  GLuint mazeIndexBuffer_;
-  Shader mazeShaderProgram_;
+  std::unique_ptr<MazeRenderer> mazeRenderer_ = nullptr;
 
-  GLint mazeProjectionLocation_;
-  GLint mazeViewLocation_;
-  GLint mazeTextureLocation_;
-
-  glm::mat4 mazeProjection_;
-
-  GLsizei wallIndexCount_;
-  GLsizei floorIndexCount_;
-  GLintptr wallIndexOffset_;
-  GLintptr floorIndexOffset_;
-
-  Texture wallTexture_;
-  Texture floorTexture_;
   Texture goalTexture_;
   glm::vec3 goalPosition_;
 

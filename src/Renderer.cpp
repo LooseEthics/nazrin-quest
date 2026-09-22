@@ -14,9 +14,6 @@ Renderer::Renderer(int width, int height)
     windowHeight_(height),
     window_(nullptr),
     context_(nullptr),
-    mazeVertexArray_(0),
-    mazeVertexBuffer_(0),
-    mazeIndexBuffer_(0),
     spriteVertexArray_(0),
     spriteVertexBuffer_(0),
     uiVertexArray_(0),
@@ -51,7 +48,7 @@ Renderer::Renderer(int width, int height)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
   mapRenderer_ = std::make_unique<MapRenderer>(windowWidth_, windowHeight_);
-  initMaze();
+  mazeRenderer_ = std::make_unique<MazeRenderer>(windowWidth_, windowHeight_);
   initSprite();
   initText();
 }
@@ -60,7 +57,6 @@ Renderer::~Renderer()
 {
   destroyText();
   destroySprite();
-  destroyMaze();
 
   if (context_) SDL_GL_DestroyContext(context_);
   if (window_) SDL_DestroyWindow(window_);
@@ -82,7 +78,7 @@ void Renderer::clear() const
 
 void Renderer::drawCamera(Camera& camera) const
 {
-  drawMaze(camera);
+  mazeRenderer_->drawMaze(camera);
   drawSprite(
     goalTexture_.id(),
     goalPosition_,
@@ -108,3 +104,4 @@ SDL_Window* Renderer::window() const
 }
 
 MapRenderer& Renderer::mapRenderer() const {return *mapRenderer_;}
+MazeRenderer& Renderer::mazeRenderer() const {return *mazeRenderer_;}

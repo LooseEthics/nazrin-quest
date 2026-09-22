@@ -116,12 +116,19 @@ void Renderer::drawSprite(
   spriteShaderProgram_.use();
 
   const glm::mat4 view = camera.viewMatrix();
+  // TODO delete this - temporary projection
+  const glm::mat4 projection = glm::perspective(
+    glm::radians(80.0f),
+    static_cast<float>(windowWidth_) / static_cast<float>(windowHeight_),
+    0.01f,
+    500.0f
+  );
 
   glUniformMatrix4fv(
     spriteProjectionLocation_,
     1,
     GL_FALSE,
-    glm::value_ptr(mazeProjection_)
+    glm::value_ptr(projection)
   );
 
   glUniformMatrix4fv(

@@ -6,7 +6,8 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "CommonGeometry.hpp"
-#include "Renderer.hpp"
+#include "MazeRenderer.hpp"
+#include "Vertex.hpp"
 
 namespace
 {
@@ -15,9 +16,15 @@ namespace
 
   constexpr const char* WALL_TEXTURE_PATH = "assets/tex_wall.png";
   constexpr const char* FLOOR_TEXTURE_PATH = "assets/tex_floor.png";
+
+  constexpr const float FOV = 80.0f;
+  constexpr const float NEAR_CULLING_PLANE = 0.01f;
+  constexpr const float FAR_CULLING_PLANE = 500.0f;
 }
 
-void Renderer::initMaze()
+MazeRenderer::MazeRenderer(uint32_t width, uint32_t height)
+  : windowWidth_(width),
+    windowHeight_(height)
 {
   glGenVertexArrays(1, &mazeVertexArray_);
   glGenBuffers(1, &mazeVertexBuffer_);
@@ -33,10 +40,10 @@ void Renderer::initMaze()
   mazeTextureLocation_ = mazeShaderProgram_.textureLocation();
 
   mazeProjection_ = glm::perspective(
-    glm::radians(80.0f),
+    glm::radians(FOV),
     static_cast<float>(windowWidth_) / static_cast<float>(windowHeight_),
-    0.01f,
-    500.0f
+    NEAR_CULLING_PLANE,
+    FAR_CULLING_PLANE
   );
 
   glBindVertexArray(mazeVertexArray_);
@@ -69,14 +76,14 @@ void Renderer::initMaze()
   floorTexture_ = Texture{FLOOR_TEXTURE_PATH};
 }
 
-void Renderer::destroyMaze()
+MazeRenderer::~MazeRenderer()
 {
   if (mazeIndexBuffer_) glDeleteBuffers(1, &mazeIndexBuffer_);
   if (mazeVertexBuffer_) glDeleteBuffers(1, &mazeVertexBuffer_);
   if (mazeVertexArray_) glDeleteVertexArrays(1, &mazeVertexArray_);
 }
 
-void Renderer::uploadMesh(const Mesh& mesh)
+void MazeRenderer::uploadMesh(const Mesh& mesh)
 {
   glBindVertexArray(mazeVertexArray_);
   glBindBuffer(GL_ARRAY_BUFFER, mazeVertexBuffer_);
@@ -120,7 +127,7 @@ void Renderer::uploadMesh(const Mesh& mesh)
   );
 }
 
-void Renderer::drawMaze(Camera& camera) const
+void MazeRenderer::drawMaze(Camera& camera) const
 {
   glBindVertexArray(mazeVertexArray_);
   glBindBuffer(GL_ARRAY_BUFFER, mazeVertexBuffer_);
@@ -163,5 +170,17 @@ void Renderer::drawMaze(Camera& camera) const
     floorIndexCount_,
     GL_UNSIGNED_INT,
     reinterpret_cast<void*>(floorIndexOffset_)
+  );
+}
+
+void MazeRenderer::setWindowDimensions(uint32_t width, uint32_t height)
+{
+  windowWidth_ = width;
+  windowHeight_ = height;
+  mazeProjection_ = glm::perspective(
+    glm::radians(FOV),
+    static_cast<float>(windowWidth_) / static_cast<float>(windowHeight_),
+    NEAR_CULLING_PLANE,
+    FAR_CULLING_PLANE
   );
 }

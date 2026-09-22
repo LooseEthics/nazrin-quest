@@ -209,7 +209,7 @@ void Game::startGame()
 
   player_ = std::make_unique<Player>(*maze_);
 
-  renderer_->uploadMesh(*mesh_);
+  renderer_->mazeRenderer().uploadMesh(*mesh_);
   renderer_->mapRenderer().createMapTexture(*maze_);
   renderer_->setGoalPosition(maze_->getGoalCoords());
 
