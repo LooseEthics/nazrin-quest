@@ -16,10 +16,6 @@ namespace
 
   constexpr const char* WALL_TEXTURE_PATH = "assets/tex_wall.png";
   constexpr const char* FLOOR_TEXTURE_PATH = "assets/tex_floor.png";
-
-  constexpr const float FOV = 80.0f;
-  constexpr const float NEAR_CULLING_PLANE = 0.01f;
-  constexpr const float FAR_CULLING_PLANE = 500.0f;
 }
 
 MazeRenderer::MazeRenderer(uint32_t width, uint32_t height)

@@ -6,7 +6,8 @@
 #include <vector>
 
 #include "CommonGeometry.hpp"
-#include "Renderer.hpp"
+#include "SpriteRenderer.hpp"
+#include "Vertex.hpp"
 
 namespace
 {
@@ -16,8 +17,11 @@ namespace
   constexpr const char* GOAL_TEXTURE_PATH = "assets/cheese.png";
 }
 
-void Renderer::initSprite()
+SpriteRenderer::SpriteRenderer(uint32_t width, uint32_t height)
+  : SubRendererBase(width, height)
 {
+  calculateProjection();
+
   glGenVertexArrays(1, &spriteVertexArray_);
   glGenBuffers(1, &spriteVertexBuffer_);
 
@@ -58,16 +62,16 @@ void Renderer::initSprite()
   goalTexture_ = Texture{GOAL_TEXTURE_PATH};
 }
 
-void Renderer::destroySprite()
+SpriteRenderer::~SpriteRenderer()
 {
   if (spriteVertexBuffer_) glDeleteBuffers(1, &spriteVertexBuffer_);
   if (spriteVertexArray_) glDeleteVertexArrays(1, &spriteVertexArray_);
 }
 
-void Renderer::drawSprite(
-  GLuint texture,
-  const glm::vec3 position,
-  Camera& camera,
+void SpriteRenderer::drawSprite(
+  const Texture& texture,
+  const glm::vec3& position,
+  const Camera& camera,
   float width,
   float height
 ) const
@@ -116,19 +120,12 @@ void Renderer::drawSprite(
   spriteShaderProgram_.use();
 
   const glm::mat4 view = camera.viewMatrix();
-  // TODO delete this - temporary projection
-  const glm::mat4 projection = glm::perspective(
-    glm::radians(80.0f),
-    static_cast<float>(windowWidth_) / static_cast<float>(windowHeight_),
-    0.01f,
-    500.0f
-  );
 
   glUniformMatrix4fv(
     spriteProjectionLocation_,
     1,
     GL_FALSE,
-    glm::value_ptr(projection)
+    glm::value_ptr(spriteProjection_)
   );
 
   glUniformMatrix4fv(
@@ -139,7 +136,7 @@ void Renderer::drawSprite(
   );
 
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, texture);
+  glBindTexture(GL_TEXTURE_2D, texture.id());
 
   glUniform1i(spriteTextureLocation_, 0);
 
@@ -152,4 +149,19 @@ void Renderer::drawSprite(
   );
 
   glDepthMask(GL_TRUE);
+}
+
+void SpriteRenderer::setGoalPosition(const glm::vec3 position)
+{
+  goalPosition_ = position;
+}
+
+void SpriteRenderer::calculateProjection()
+{
+  spriteProjection_ = glm::perspective(
+    glm::radians(FOV),
+    static_cast<float>(windowWidth_) / static_cast<float>(windowHeight_),
+    NEAR_CULLING_PLANE,
+    FAR_CULLING_PLANE
+  );
 }

@@ -22,6 +22,7 @@ public:
 
 private:
   void calculateProjection() override;
+  glm::mat4 mazeProjection_;
 
   GLuint mazeVertexArray_;
   GLuint mazeVertexBuffer_;
@@ -31,8 +32,6 @@ private:
   GLint mazeProjectionLocation_;
   GLint mazeViewLocation_;
   GLint mazeTextureLocation_;
-
-  glm::mat4 mazeProjection_;
 
   GLsizei wallIndexCount_;
   GLsizei floorIndexCount_;

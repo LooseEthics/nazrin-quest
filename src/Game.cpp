@@ -211,7 +211,7 @@ void Game::startGame()
 
   renderer_->mazeRenderer().uploadMesh(*mesh_);
   renderer_->mapRenderer().createMapTexture(*maze_);
-  renderer_->setGoalPosition(maze_->getGoalCoords());
+  renderer_->spriteRenderer().setGoalPosition(maze_->getGoalCoords());
 
   mapVisible_ = false;
   state_ = GameState::Playing;

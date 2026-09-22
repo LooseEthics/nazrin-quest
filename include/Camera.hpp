@@ -3,6 +3,10 @@
 
 #include <glm/glm.hpp>
 
+constexpr const float FOV = 80.0f;
+constexpr const float NEAR_CULLING_PLANE = 0.01f;
+constexpr const float FAR_CULLING_PLANE = 500.0f;
+
 class Camera
 {
 public:

@@ -14,8 +14,6 @@ Renderer::Renderer(int width, int height)
     windowHeight_(height),
     window_(nullptr),
     context_(nullptr),
-    spriteVertexArray_(0),
-    spriteVertexBuffer_(0),
     uiVertexArray_(0),
     uiVertexBuffer_(0)
 {
@@ -49,14 +47,13 @@ Renderer::Renderer(int width, int height)
 
   mapRenderer_ = std::make_unique<MapRenderer>(windowWidth_, windowHeight_);
   mazeRenderer_ = std::make_unique<MazeRenderer>(windowWidth_, windowHeight_);
-  initSprite();
+  spriteRenderer_ = std::make_unique<SpriteRenderer>(windowWidth_, windowHeight_);
   initText();
 }
 
 Renderer::~Renderer()
 {
   destroyText();
-  destroySprite();
 
   if (context_) SDL_GL_DestroyContext(context_);
   if (window_) SDL_DestroyWindow(window_);
@@ -79,9 +76,9 @@ void Renderer::clear() const
 void Renderer::drawCamera(Camera& camera) const
 {
   mazeRenderer_->drawMaze(camera);
-  drawSprite(
-    goalTexture_.id(),
-    goalPosition_,
+  spriteRenderer_->drawSprite(
+    spriteRenderer_->goalTexture_,
+    spriteRenderer_->goalPosition_,
     camera,
     CELL_SIZE / 2,
     CELL_SIZE / 2
@@ -93,11 +90,6 @@ void Renderer::present() const
   SDL_GL_SwapWindow(window_);
 }
 
-void Renderer::setGoalPosition(const glm::vec3 position)
-{
-  goalPosition_ = position;
-}
-
 SDL_Window* Renderer::window() const
 {
   return window_;
@@ -105,3 +97,4 @@ SDL_Window* Renderer::window() const
 
 MapRenderer& Renderer::mapRenderer() const {return *mapRenderer_;}
 MazeRenderer& Renderer::mazeRenderer() const {return *mazeRenderer_;}
+SpriteRenderer& Renderer::spriteRenderer() const {return *spriteRenderer_;}

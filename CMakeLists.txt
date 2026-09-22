@@ -62,13 +62,13 @@ set(SOURCES
   src/Input.cpp
   src/CommonGeometry.cpp
   src/Game.cpp
-  src/Renderer_Sprite.cpp
   src/Renderer_Text.cpp
   src/Texture.cpp
   src/Shader.cpp
   src/MapRenderer.cpp
   src/MazeRenderer.cpp
   src/SubRendererBase.cpp
+  src/SpriteRenderer.cpp
 )
 
 add_executable(nazrin-quest ${SOURCES})

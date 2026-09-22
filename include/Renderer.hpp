@@ -11,9 +11,8 @@
 #include "MapRenderer.hpp"
 #include "MazeRenderer.hpp"
 #include "Shader.hpp"
+#include "SpriteRenderer.hpp"
 #include "Texture.hpp"
-
-std::string readFile(const std::string& path);
 
 class Renderer
 {
@@ -35,29 +34,17 @@ public:
     float scale,
     const glm::vec3& color
   ) const;
-  void drawSprite(
-    GLuint texture,
-    const glm::vec3 position,
-    Camera& camera,
-    float width,
-    float height
-  ) const;
   void present() const;
-
-  void setGoalPosition(const glm::vec3 position);
 
   [[nodiscard]]
   SDL_Window* window() const;
   MapRenderer& mapRenderer() const;
   MazeRenderer& mazeRenderer() const;
+  SpriteRenderer& spriteRenderer() const;
 
 private:
-  void initMaze();
-  void initSprite();
   void initText();
 
-  void destroyMaze();
-  void destroySprite();
   void destroyText();
 
   uint32_t windowWidth_;
@@ -67,17 +54,7 @@ private:
   SDL_GLContext context_;
 
   std::unique_ptr<MazeRenderer> mazeRenderer_ = nullptr;
-
-  Texture goalTexture_;
-  glm::vec3 goalPosition_;
-
-  GLuint spriteVertexArray_;
-  GLuint spriteVertexBuffer_;
-  Shader spriteShaderProgram_;
-
-  GLint spriteProjectionLocation_;
-  GLint spriteViewLocation_;
-  GLint spriteTextureLocation_;
+  std::unique_ptr<SpriteRenderer> spriteRenderer_ = nullptr;
 
   GLuint uiVertexArray_;
   GLuint uiVertexBuffer_;
