@@ -33,13 +33,15 @@ void VisibilitySystem::recalculateCells(
       MazeCoord activeCell = neighborCell;
       while (isValidCell(activeCell)){
         visibleCells_.insert(activeCell);
-        activeCell = activeCell + neighborOffset(marchDirection);
+        
         MazeCoord lhc = activeCell + neighborOffset(leftCardinal(marchDirection));
         MazeCoord rhc = activeCell + neighborOffset(rightCardinal(marchDirection));
         if (isValidCell(lhc))
           visibleCells_.insert(lhc);
         if (isValidCell(rhc))
           visibleCells_.insert(rhc);
+
+        activeCell = activeCell + neighborOffset(marchDirection);
       }
     }
   }
