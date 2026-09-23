@@ -111,6 +111,8 @@ void Game::updatePlaying(float deltaTime)
   if (player_->goalReached()){
     state_ = GameState::Won;
   }
+
+  visibleCells_ = visibility_->visibleCells(*maze_, player_->pos());
 }
 
 void Game::updateWon(float deltaTime)
@@ -227,5 +229,8 @@ void Game::startGame()
   renderer_->mapRenderer().createMapTexture(*maze_);
 
   mapVisible_ = false;
+
+  visibility_ = std::make_unique<VisibilitySystem>();
+
   state_ = GameState::Playing;
 }

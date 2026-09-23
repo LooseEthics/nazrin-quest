@@ -34,9 +34,6 @@ public:
   float pitch();
 
   [[nodiscard]]
-  Maze::Coord mazeCell() const;
-
-  [[nodiscard]]
   bool goalReached() const noexcept;
 
 private:

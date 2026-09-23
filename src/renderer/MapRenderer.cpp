@@ -2,7 +2,9 @@
 #include <array>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Cell.hpp"
 #include "MapRenderer.hpp"
+#include "MazeCoord.hpp"
 
 namespace
 {
@@ -108,7 +110,7 @@ void MapRenderer::createMapTexture(const Maze& maze)
         pixels[i + 1] = 255;
         pixels[i + 2] = 255;
         pixels[i + 3] = 255;
-      } else if (Maze::Coord{x, z} == maze.getGoal()) {
+      } else if (MazeCoord{x, z} == maze.getGoal()) {
         pixels[i + 0] = 0;
         pixels[i + 1] = 255;
         pixels[i + 2] = 0;

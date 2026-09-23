@@ -10,6 +10,7 @@
 #include "Mesh.hpp"
 #include "Player.hpp"
 #include "Renderer.hpp"
+#include "VisibilitySystem.hpp"
 
 enum class GameState
 {
@@ -85,4 +86,8 @@ private:
   float winTime_ = 0.0f;
 
   std::vector<std::unique_ptr<Entity>> entities_;
+
+  std::unique_ptr<VisibilitySystem> visibility_;
+  std::set<MazeCoord> visibleCells_;
+  std::set<Entity*> visibleEntities_;
 };

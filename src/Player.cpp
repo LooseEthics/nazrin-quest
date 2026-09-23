@@ -169,15 +169,7 @@ glm::vec3 Player::pos() {return pos_;}
 float Player::yaw() {return yaw_;}
 float Player::pitch() {return pitch_;}
 
-Maze::Coord Player::mazeCell() const
-{
-  return {
-    static_cast<int>(std::floor(pos_.x / CELL_SIZE)),
-    static_cast<int>(std::floor(pos_.z / CELL_SIZE))
-  };
-}
-
 bool Player::goalReached() const noexcept
 {
-  return mazeCell() == maze_.getGoal();
+  return maze_.world2xy(pos_) == maze_.getGoal();
 }

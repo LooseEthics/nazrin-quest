@@ -1,6 +1,10 @@
 
 #pragma once
 
+#include <cstdint>
+
+#include "MazeCoord.hpp"
+
 constexpr uint8_t D_EAST  = 0x01;
 constexpr uint8_t D_SOUTH = 0x02;
 constexpr uint8_t D_WEST  = 0x04;
@@ -54,6 +58,39 @@ constexpr Direction opposite(Direction dir)
     case Direction::North: return Direction::South;
     case Direction::Up: return Direction::Up;
     case Direction::Down: return Direction::Down;
+    default: return Direction::Invalid;
+  }
+}
+
+constexpr MazeCoord neighborOffset(Direction dir)
+{
+  switch (dir){
+    case Direction::East: return {1, 0};
+    case Direction::South: return {0, 1};
+    case Direction::West: return {-1, 0};
+    case Direction::North: return {0, -1};
+    default: return {0, 0};
+  }
+}
+
+constexpr Direction leftCardinal(Direction dir)
+{
+  switch (dir){
+    case Direction::East: return Direction::North;
+    case Direction::South: return Direction::East;
+    case Direction::West: return Direction::South;
+    case Direction::North: return Direction::West;
+    default: return Direction::Invalid;
+  }
+}
+
+constexpr Direction rightCardinal(Direction dir)
+{
+  switch (dir){
+    case Direction::East: return Direction::South;
+    case Direction::South: return Direction::West;
+    case Direction::West: return Direction::North;
+    case Direction::North: return Direction::East;
     default: return Direction::Invalid;
   }
 }

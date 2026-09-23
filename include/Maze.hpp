@@ -5,17 +5,13 @@
 #include <glm/glm.hpp>
 #include <vector>
 
+#include "Cell.hpp"
 #include "CommonGeometry.hpp"
 #include "LogicMaze.hpp"
+#include "MazeCoord.hpp"
 
 constexpr int MAZE_MIN_SIZE = 5;
 constexpr int MAZE_MAX_SIZE = 205;
-
-enum class Cell : std::uint8_t
-{
-  Wall,
-  Empty
-};
 
 class Maze
 {
@@ -24,8 +20,12 @@ public:
   Maze(int width, int height, const LogicMaze& logicMaze);
 
   [[nodiscard]]
+  bool isInside(MazeCoord coord) const;
+  [[nodiscard]]
   bool isInside(int x, int y) const;
 
+  [[nodiscard]]
+  Cell get(MazeCoord coord) const;
   [[nodiscard]]
   Cell get(int x, int y) const;
 
@@ -41,28 +41,30 @@ public:
 
   void printMazeToConsole() const;
 
-  struct Coord
-  {
-    int x;
-    int y;
-
-    bool operator==(const Coord&) const = default;
-  };
-
   constexpr int xy2index(int x, int y) const
   {
     return y * width_ + x;
   }
 
-  constexpr Coord index2coord(int i) const
+  constexpr MazeCoord index2coord(int i) const
   {
     return {i % width_, i / width_};
   }
 
+  constexpr int world2index(glm::vec3 pos) const
+  {
+    return static_cast<int>(pos.z / CELL_SIZE) * width_ + static_cast<int>(pos.x / CELL_SIZE);
+  }
+
+  constexpr MazeCoord world2xy(glm::vec3 pos) const
+  {
+    return index2coord(world2index(pos));
+  }
+
   void setStart(int x, int y);
   void setGoal(int x, int y);
-  Coord getStart() const;
-  Coord getGoal() const;
+  MazeCoord getStart() const;
+  MazeCoord getGoal() const;
   glm::vec3 getStartCoords() const;
   glm::vec3 getGoalCoords() const;
 
@@ -71,6 +73,6 @@ private:
   int height_;
   std::vector<Cell> cells_;
 
-  Coord start_;
-  Coord goal_;
+  MazeCoord start_;
+  MazeCoord goal_;
 };

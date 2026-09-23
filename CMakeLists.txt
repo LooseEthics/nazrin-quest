@@ -71,6 +71,7 @@ set(SOURCES
   src/renderer/SubRendererBase.cpp
   src/renderer/TextRenderer.cpp
   src/renderer/Texture.cpp
+  src/renderer/VisibilitySystem.cpp
 )
 
 add_executable(nazrin-quest ${SOURCES})
@@ -80,6 +81,7 @@ target_include_directories(nazrin-quest
   include
   include/entities
   include/renderer
+  include/structs
   ${stb_SOURCE_DIR}
 )
 

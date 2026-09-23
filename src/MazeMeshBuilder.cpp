@@ -3,6 +3,7 @@
 #include <iostream>
 #include <stdexcept>
 
+#include "Cell.hpp"
 #include "MazeMeshBuilder.hpp"
 
 Mesh MazeMeshBuilder::build(const Maze& maze) const

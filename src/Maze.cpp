@@ -34,10 +34,20 @@ Maze::Maze(int width, int height, const LogicMaze& logicMaze)
   }
 }
 
+bool Maze::isInside(MazeCoord coord) const
+{
+  return isInside(coord.x, coord.y);
+}
+
 bool Maze::isInside(int x, int y) const
 {
   return x >= 0 && x < width_ &&
     y >= 0 && y < height_;
+}
+
+Cell Maze::get(MazeCoord coord) const
+{
+  return get(coord.x, coord.y);
 }
 
 Cell Maze::get(int x, int y) const
@@ -94,12 +104,12 @@ void Maze::setGoal(int x, int y)
   goal_ = {x, y};
 }
 
-Maze::Coord Maze::getStart() const
+MazeCoord Maze::getStart() const
 {
   return start_;
 }
 
-Maze::Coord Maze::getGoal() const
+MazeCoord Maze::getGoal() const
 {
   return goal_;
 }
