@@ -70,6 +70,19 @@ SpriteRenderer::~SpriteRenderer()
 }
 
 void SpriteRenderer::drawSprite(
+  SpriteRenderCall spriteCall,
+  const Camera& camera
+) const {
+  drawSprite(
+    spriteCall.sprite,
+    spriteCall.position,
+    camera,
+    spriteCall.width,
+    spriteCall.height
+  );
+}
+
+void SpriteRenderer::drawSprite(
   SpriteId sprite,
   const glm::vec3& position,
   const Camera& camera,

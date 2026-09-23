@@ -32,3 +32,12 @@ glm::vec3 Entity::position() const {return position_;}
 SpriteId Entity::sprite() const {return sprite_;}
 float Entity::width() const {return spriteWidth_;}
 float Entity::height() const {return spriteHeight_;}
+
+SpriteRenderCall Entity::renderCall() const {
+  return {
+    sprite_,
+    position_,
+    spriteWidth_,
+    spriteHeight_
+  };
+}

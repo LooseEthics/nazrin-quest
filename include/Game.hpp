@@ -70,6 +70,7 @@ private:
   void changeConfigValue(ConfigField field, int increment);
 
   void startGame();
+  void updatePlayerCell();
 
   GameState state_ = GameState::Config;
   GameConfig config_;
@@ -88,6 +89,6 @@ private:
   std::vector<std::unique_ptr<Entity>> entities_;
 
   std::unique_ptr<VisibilitySystem> visibility_;
-  std::set<MazeCoord> visibleCells_;
   std::set<Entity*> visibleEntities_;
+  MazeCoord playerCell_;
 };

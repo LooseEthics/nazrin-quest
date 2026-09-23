@@ -7,6 +7,7 @@
 
 #include "Camera.hpp"
 #include "Shader.hpp"
+#include "SpriteRenderCall.hpp"
 #include "SubRendererBase.hpp"
 #include "Texture.hpp"
 
@@ -15,6 +16,11 @@ class SpriteRenderer : public SubRendererBase
 public:
   SpriteRenderer(uint32_t width, uint32_t height);
   ~SpriteRenderer();
+
+  void drawSprite(
+    SpriteRenderCall spriteCall,
+    const Camera& camera
+  ) const;
 
   void drawSprite(
     SpriteId sprite,

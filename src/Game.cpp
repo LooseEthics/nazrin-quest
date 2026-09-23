@@ -103,6 +103,11 @@ void Game::updateConfig(float deltaTime)
 void Game::updatePlaying(float deltaTime)
 {
   player_->update(*input_, deltaTime);
+
+  if (playerCell_ != maze_->world2xy(player_->pos())){
+    updatePlayerCell();
+  }
+
   for (auto& entity : entities_)
     entity->update(deltaTime);
 
@@ -111,8 +116,6 @@ void Game::updatePlaying(float deltaTime)
   if (player_->goalReached()){
     state_ = GameState::Won;
   }
-
-  visibleCells_ = visibility_->visibleCells(*maze_, player_->pos());
 }
 
 void Game::updateWon(float deltaTime)
@@ -149,13 +152,10 @@ void Game::renderPlaying()
   renderer_->clear();
   if (!mapVisible_){
     renderer_->mazeRenderer().drawMaze(player_->camera());
-    for (auto& entity : entities_)
+    for (auto& entity : visibleEntities_)
       renderer_->spriteRenderer().drawSprite(
-        entity->sprite(),
-        entity->position(),
-        player_->camera(),
-        entity->width(),
-        entity->height()
+        entity->renderCall(),
+        player_->camera()
       );
   }
   else
@@ -231,6 +231,17 @@ void Game::startGame()
   mapVisible_ = false;
 
   visibility_ = std::make_unique<VisibilitySystem>();
+  updatePlayerCell();
 
   state_ = GameState::Playing;
+}
+
+void Game::updatePlayerCell()
+{
+  playerCell_ = maze_->world2xy(player_->pos());
+  visibility_->recalculateCells(*maze_, player_->pos());
+  visibleEntities_.clear();
+  for (auto& entity : entities_)
+    if (visibility_->visibleCells().contains(maze_->world2xy(entity->position())))
+      visibleEntities_.insert(entity.get());
 }

@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <glad/gl.h>
+#include <glm/vec3.hpp>
 #include <set>
 
 #include "Maze.hpp"
@@ -12,12 +12,13 @@ class VisibilitySystem
 public:
   VisibilitySystem() = default;
 
-  const std::set<MazeCoord>& visibleCells(
+  void recalculateCells(
     const Maze& maze,
     const glm::vec3& position
   );
 
+  const std::set<MazeCoord>& visibleCells() const;
+
 private:
-  MazeCoord lastPlayerCoord_ = {-1, -1};
   std::set<MazeCoord> visibleCells_;
 };

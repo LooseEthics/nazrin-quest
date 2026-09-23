@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 #include "SpriteId.hpp"
+#include "SpriteRenderCall.hpp"
 
 class Entity
 {
@@ -22,6 +23,8 @@ public:
   SpriteId sprite() const;
   float width() const;
   float height() const;
+
+  SpriteRenderCall renderCall() const;
 
 protected:
   glm::vec3 position_;

@@ -2,13 +2,11 @@
 #include "Direction.hpp"
 #include "VisibilitySystem.hpp"
 
-const std::set<MazeCoord>& VisibilitySystem::visibleCells(
+void VisibilitySystem::recalculateCells(
   const Maze& maze,
   const glm::vec3& position
 ) {
   MazeCoord playerCell = maze.world2xy(position);
-
-  if (playerCell == lastPlayerCoord_) return visibleCells_;
 
   const auto isValidCell = [&](MazeCoord cell) {
     return maze.isInside(cell) && maze.get(cell) != Cell::Wall;
@@ -45,6 +43,6 @@ const std::set<MazeCoord>& VisibilitySystem::visibleCells(
       }
     }
   }
-  lastPlayerCoord_ = playerCell;
-  return visibleCells_;
 }
+
+const std::set<MazeCoord>& VisibilitySystem::visibleCells() const {return visibleCells_;}
