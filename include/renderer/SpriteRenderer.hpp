@@ -44,6 +44,8 @@ private:
   GLint spriteTextureLocation_;
 
   Texture goalTexture_;
+  Texture frogIdleTexture_;
+  Texture frogLeapTexture_;
 
   std::unordered_map<SpriteId, Texture*> sprites_;
 };

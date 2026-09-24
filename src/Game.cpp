@@ -1,6 +1,7 @@
 
 #include <iostream>
 
+#include "FrogEntity.hpp"
 #include "Game.hpp"
 #include "GoalEntity.hpp"
 #include "MazeGenerator.hpp"
@@ -224,6 +225,7 @@ void Game::startGame()
   player_ = std::make_unique<Player>(*maze_);
 
   entities_.push_back(std::make_unique<GoalEntity>(maze_->getGoalCoords()));
+  entities_.push_back(std::make_unique<FrogEntity>(*maze_, player_->pos()));
 
   renderer_->mazeRenderer().uploadMesh(*mesh_);
   renderer_->mapRenderer().createMapTexture(*maze_);

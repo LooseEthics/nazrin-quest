@@ -15,6 +15,8 @@ namespace
   constexpr const char* SPRITE_FRAGMENT_SHADER_PATH = "shaders/sprite.frag";
 
   constexpr const char* GOAL_TEXTURE_PATH = "assets/cheese.png";
+  constexpr const char* FROG_IDLE_TEXTURE_PATH = "assets/frog_idle.png";
+  constexpr const char* FROG_LEAP_TEXTURE_PATH = "assets/frog_leap.png";
 }
 
 SpriteRenderer::SpriteRenderer(uint32_t width, uint32_t height)
@@ -61,6 +63,10 @@ SpriteRenderer::SpriteRenderer(uint32_t width, uint32_t height)
 
   goalTexture_ = Texture{GOAL_TEXTURE_PATH};
   sprites_.insert({SpriteId::Cheese, &goalTexture_});
+  frogIdleTexture_ = Texture{FROG_IDLE_TEXTURE_PATH};
+  sprites_.insert({SpriteId::Frog_Idle, &frogIdleTexture_});
+  frogLeapTexture_ = Texture{FROG_LEAP_TEXTURE_PATH};
+  sprites_.insert({SpriteId::Frog_Leap, &frogLeapTexture_});
 }
 
 SpriteRenderer::~SpriteRenderer()

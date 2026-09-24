@@ -61,6 +61,7 @@ set(SOURCES
   src/MazeMeshBuilder.cpp
   src/Player.cpp
   src/entities/Entity.cpp
+  src/entities/FrogEntity.cpp
   src/entities/GoalEntity.cpp
   src/renderer/Camera.cpp
   src/renderer/MapRenderer.cpp
