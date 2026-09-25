@@ -6,17 +6,14 @@
 #include <vector>
 
 #include "CommonGeometry.hpp"
+#include "FlatTransform.hpp"
+#include "Quad.hpp"
 #include "SpriteRenderer.hpp"
-#include "Vertex.hpp"
 
 namespace
 {
   constexpr const char* SPRITE_VERTEX_SHADER_PATH = "shaders/sprite.vert";
   constexpr const char* SPRITE_FRAGMENT_SHADER_PATH = "shaders/sprite.frag";
-
-  constexpr const char* GOAL_TEXTURE_PATH = "assets/cheese.png";
-  constexpr const char* FROG_IDLE_TEXTURE_PATH = "assets/frog_idle.png";
-  constexpr const char* FROG_LEAP_TEXTURE_PATH = "assets/frog_leap.png";
 }
 
 SpriteRenderer::SpriteRenderer(uint32_t width, uint32_t height)
@@ -61,12 +58,9 @@ SpriteRenderer::SpriteRenderer(uint32_t width, uint32_t height)
 
   glEnableVertexAttribArray(1);
 
-  goalTexture_ = Texture{GOAL_TEXTURE_PATH};
-  sprites_.insert({SpriteId::Cheese, &goalTexture_});
-  frogIdleTexture_ = Texture{FROG_IDLE_TEXTURE_PATH};
-  sprites_.insert({SpriteId::Frog_Idle, &frogIdleTexture_});
-  frogLeapTexture_ = Texture{FROG_LEAP_TEXTURE_PATH};
-  sprites_.insert({SpriteId::Frog_Leap, &frogLeapTexture_});
+  for (const auto& [id, path] : texturePaths_){
+    sprites_.emplace(id, Texture{path});
+  }
 }
 
 SpriteRenderer::~SpriteRenderer()
@@ -76,27 +70,10 @@ SpriteRenderer::~SpriteRenderer()
 }
 
 void SpriteRenderer::drawSprite(
-  SpriteRenderCall spriteCall,
+  SpriteRenderCall renderCall,
   const Camera& camera
 ) const {
-  drawSprite(
-    spriteCall.sprite,
-    spriteCall.position,
-    camera,
-    spriteCall.width,
-    spriteCall.height
-  );
-}
-
-void SpriteRenderer::drawSprite(
-  SpriteId sprite,
-  const glm::vec3& position,
-  const Camera& camera,
-  float width,
-  float height
-) const
-{
-  glm::vec3 direction = camera.position() - position;
+  glm::vec3 direction = camera.position() - renderCall.position;
   direction.y = 0.0f;
 
   if (glm::length(direction) < 0.001f)
@@ -112,20 +89,12 @@ void SpriteRenderer::drawSprite(
 
   const glm::vec3 up{0.0f, 1.0f, 0.0f};
 
-  const glm::vec3 bottomLeft  = position - right * (width * 0.5f);
-  const glm::vec3 bottomRight = position + right * (width * 0.5f);
-  const glm::vec3 topLeft     = bottomLeft + up * height;
-  const glm::vec3 topRight    = bottomRight + up * height;
+  const glm::vec3 bottomLeft  = renderCall.position - right * (renderCall.width * 0.5f);
+  const glm::vec3 bottomRight = renderCall.position + right * (renderCall.width * 0.5f);
+  const glm::vec3 topLeft     = bottomLeft + up * renderCall.height;
+  const glm::vec3 topRight    = bottomRight + up * renderCall.height;
 
-  std::vector<Vertex> vertices{
-    {bottomRight, glm::vec2{1.0f, 1.0f}},
-    {bottomLeft,  glm::vec2{0.0f, 1.0f}},
-    {topLeft,     glm::vec2{0.0f, 0.0f}},
-
-    {bottomRight, glm::vec2{1.0f, 1.0f}},
-    {topLeft,     glm::vec2{0.0f, 0.0f}},
-    {topRight,    glm::vec2{1.0f, 0.0f}}
-  };
+  std::vector<Vertex> vertices = quadVertices(bottomLeft, bottomRight, topLeft, topRight, FlatTransform::None);
 
   glBindVertexArray(spriteVertexArray_);
   glBindBuffer(GL_ARRAY_BUFFER, spriteVertexBuffer_);
@@ -155,7 +124,90 @@ void SpriteRenderer::drawSprite(
     glm::value_ptr(view)
   );
 
-  const Texture& texture = *sprites_.at(sprite);
+  const Texture& texture = sprites_.at(renderCall.sprite);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, texture.id());
+
+  glUniform1i(spriteTextureLocation_, 0);
+
+  glDepthMask(GL_FALSE);
+
+  glDrawArrays(
+    GL_TRIANGLES,
+    0,
+    static_cast<GLsizei>(vertices.size())
+  );
+
+  glDepthMask(GL_TRUE);
+}
+
+void SpriteRenderer::drawViewModel(
+  ViewmodelRenderCall renderCall,
+  const Camera& camera
+) const {
+  constexpr float VIEWMODEL_RADIUS = 0.5f;
+
+  const float yaw = camera.yaw() + renderCall.cameraRelativeYaw;
+  const float pitch = renderCall.worldRelativePitch;
+
+  const float cosPitch = std::cos(pitch);
+
+  const glm::vec3 direction{
+    std::sin(yaw) * cosPitch,
+    std::sin(pitch),
+    std::cos(yaw) * cosPitch
+  };
+
+  const glm::vec3 center = camera.position() + direction * VIEWMODEL_RADIUS;
+
+  const glm::vec3 worldUp = {0.0f, 1.0f, 0.0f};
+
+  const glm::vec3 right = glm::normalize(glm::cross(camera.forward(), worldUp));
+
+  const glm::vec3 up = glm::cross(camera.forward(), right);
+
+  const glm::vec2& uvAnchor = renderCall.uvAnchorPoint;
+  const glm::vec3 rightX = right * renderCall.size.x;
+  const glm::vec3 upY = up * renderCall.size.y;
+
+  const glm::vec3 bottomLeft =  center - rightX * uvAnchor.x       - upY * uvAnchor.y;
+  const glm::vec3 bottomRight = center + rightX * (1 - uvAnchor.x) - upY * uvAnchor.y;
+  const glm::vec3 topLeft =     center - rightX * uvAnchor.x       + upY * (1 - uvAnchor.y);
+  const glm::vec3 topRight =    center + rightX * (1 - uvAnchor.x) + upY * (1 - uvAnchor.y);
+
+  const std::vector<Vertex> vertices =
+    quadVertices(bottomLeft, bottomRight, topLeft, topRight, renderCall.tf);
+
+  glBindVertexArray(spriteVertexArray_);
+  glBindBuffer(GL_ARRAY_BUFFER, spriteVertexBuffer_);
+
+  glBufferData(
+    GL_ARRAY_BUFFER,
+    vertices.size() * sizeof(Vertex),
+    vertices.data(),
+    GL_STATIC_DRAW
+  );
+
+  spriteShaderProgram_.use();
+
+  glUniformMatrix4fv(
+    spriteProjectionLocation_,
+    1,
+    GL_FALSE,
+    glm::value_ptr(spriteProjection_)
+  );
+
+  const glm::mat4 view = camera.viewMatrix();
+
+  glUniformMatrix4fv(
+    spriteViewLocation_,
+    1,
+    GL_FALSE,
+    glm::value_ptr(view)
+  );
+
+  const Texture& texture = sprites_.at(renderCall.sprite);
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture.id());

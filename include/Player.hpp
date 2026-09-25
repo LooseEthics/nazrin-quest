@@ -46,6 +46,6 @@ private:
   Camera camera_;
   glm::vec3 cameraOffset();
 
-  static constexpr float maxPitch = glm::radians(89.0f);
+  static constexpr float maxPitch = glm::radians(75.0f);
   static constexpr float collisionRadius = CELL_SIZE / 8.0f;
 };

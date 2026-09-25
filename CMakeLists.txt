@@ -66,6 +66,7 @@ set(SOURCES
   src/renderer/Camera.cpp
   src/renderer/MapRenderer.cpp
   src/renderer/MazeRenderer.cpp
+  src/renderer/Quad.cpp
   src/renderer/Renderer.cpp
   src/renderer/Shader.cpp
   src/renderer/SpriteRenderer.cpp

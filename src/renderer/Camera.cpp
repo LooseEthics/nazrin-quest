@@ -40,3 +40,18 @@ glm::mat4 Camera::viewMatrix() const
     upVector_
   );
 }
+
+float Camera::yaw() const
+{
+  return yaw_;
+}
+
+float Camera::pitch() const
+{
+  return pitch_;
+}
+
+glm::vec3 Camera::forward() const
+{
+  return forwardVector(yaw_, pitch_);
+}

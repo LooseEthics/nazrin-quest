@@ -25,6 +25,10 @@ public:
 
   glm::mat4 viewMatrix() const;
 
+  float yaw() const;
+  float pitch() const;
+  glm::vec3 forward() const;
+
 private:
   glm::vec3 pos_;
   float yaw_;

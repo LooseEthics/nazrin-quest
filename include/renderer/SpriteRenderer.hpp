@@ -10,6 +10,8 @@
 #include "SpriteRenderCall.hpp"
 #include "SubRendererBase.hpp"
 #include "Texture.hpp"
+#include "Vertex.hpp"
+#include "ViewmodelRenderCall.hpp"
 
 class SpriteRenderer : public SubRendererBase
 {
@@ -18,16 +20,13 @@ public:
   ~SpriteRenderer();
 
   void drawSprite(
-    SpriteRenderCall spriteCall,
+    SpriteRenderCall renderCall,
     const Camera& camera
   ) const;
 
-  void drawSprite(
-    SpriteId sprite,
-    const glm::vec3& position,
-    const Camera& camera,
-    float width,
-    float height
+  void drawViewModel(
+    ViewmodelRenderCall renderCall,
+    const Camera& camera
   ) const;
 
 
@@ -43,9 +42,11 @@ private:
   GLint spriteViewLocation_;
   GLint spriteTextureLocation_;
 
-  Texture goalTexture_;
-  Texture frogIdleTexture_;
-  Texture frogLeapTexture_;
-
-  std::unordered_map<SpriteId, Texture*> sprites_;
+  std::unordered_map<SpriteId, Texture> sprites_;
+  const std::unordered_map<SpriteId, std::string> texturePaths_{
+    {SpriteId::Cheese, "assets/cheese.png"},
+    {SpriteId::Frog_Idle, "assets/frog_idle.png"},
+    {SpriteId::Frog_Leap, "assets/frog_leap.png"},
+    {SpriteId::POV_Mantle, "assets/POV_mantle.png"}
+  };
 };

@@ -153,11 +153,23 @@ void Game::renderPlaying()
   renderer_->clear();
   if (!mapVisible_){
     renderer_->mazeRenderer().drawMaze(player_->camera());
-    for (auto& entity : visibleEntities_)
+    for (auto& entity : visibleEntities_){
       renderer_->spriteRenderer().drawSprite(
         entity->renderCall(),
         player_->camera()
       );
+    }
+    renderer_->spriteRenderer().drawViewModel(
+      {
+        SpriteId::POV_Mantle,
+        0.0f,
+        glm::radians(-90.0f),
+        {2.0f, 2.0f},
+        {0.5f, 0.3f},
+        FlatTransform::Rot180
+      },
+      player_->camera()
+    );
   }
   else
     renderer_->mapRenderer().drawMap(player_->pos(), player_->yaw());
