@@ -24,27 +24,12 @@ Camera& Player::camera()
 
 void Player::update(const Input& input, float deltaTime)
 {
-  constexpr float MOVE_SPEED = 5.0f;
   constexpr float LOOK_SPEED = 0.0025f;
-  const glm::vec3 forwardVec = flatForwardVector(yaw_, pitch_);
 
-  float forward = 0.0f;
-  float right = 0.0f;
+  setTargetLocalVelocity(input);
+  updateVelocity(deltaTime);
 
-  if (input.forward()) forward += 1.0;
-  if (input.backward()) forward -= 1.0;
-  if (input.right()) right += 1.0;
-  if (input.left()) right -= 1.0;
-
-  if (forward != 0 && right != 0){
-    forward *= glm::one_over_root_two<float>();
-    right *= glm::one_over_root_two<float>();
-  }
-
-  float dx = (forwardVec.x * forward - forwardVec.z * right) * MOVE_SPEED * deltaTime;
-  float dz = (forwardVec.z * forward + forwardVec.x * right) * MOVE_SPEED * deltaTime;
-
-  move(dx, dz);
+  move(velocity_ * deltaTime);
 
   // moveForward(forward * MOVE_SPEED * deltaTime);
   // moveRight(right * MOVE_SPEED * deltaTime);
@@ -70,20 +55,33 @@ void Player::setPos(float x, float y, float z)
   pos_ = glm::vec3{x, y, z};
 }
 
-void Player::move(float dx, float dz)
+void Player::move(glm::vec3 displacement)
 {
   // assuming distance to move is less than collision radius
-  if (dx == 0.0f && dz == 0.0f) return;
+  float dx = displacement.x;
+  float dy = displacement.y;
+  float dz = displacement.z;
+  if (dx == 0.0f && dy == 0.0f && dz == 0.0f) return;
 
   glm::vec3 candidate = pos_;
 
   candidate.x += dx;
   resolveCollision(candidate);
 
+  candidate.y += dy;
+  resolveVertCollision(candidate);
+
   candidate.z += dz;
   resolveCollision(candidate);
 
   pos_ = candidate;
+}
+
+void Player::resolveVertCollision(glm::vec3& position)
+{
+  if (position.y <= FLOOR + LANDING_TOLERANCE){
+    position.y = FLOOR;
+  }
 }
 
 void Player::resolveCollision(glm::vec3& position)
@@ -172,4 +170,71 @@ float Player::pitch() {return pitch_;}
 bool Player::goalReached() const noexcept
 {
   return maze_.world2xy(pos_) == maze_.getGoal();
+}
+
+glm::vec3 Player::targetWorldVelocity() const
+{
+  const glm::vec3 forward = flatForwardVector(yaw_, 0.0f);
+  const glm::vec3 right ={-forward.z, 0.0f, forward.x};
+
+  return forward * targetLocalVelocity_.x + right * targetLocalVelocity_.z;
+}
+
+void Player::setTargetLocalVelocity(const Input& input)
+{
+  targetLocalVelocity_ = {0.0f, 0.0f, 0.0f};
+
+  if (input.forward()) targetLocalVelocity_.x += 1.0;
+  if (input.backward()) targetLocalVelocity_.x -= 1.0;
+  if (input.right()) targetLocalVelocity_.z += 1.0;
+  if (input.left()) targetLocalVelocity_.z -= 1.0;
+
+  targetLocalVelocity_ *= maxSpeed;
+
+  if (targetLocalVelocity_.x != 0 && targetLocalVelocity_.z != 0){
+    targetLocalVelocity_ *= glm::one_over_root_two<float>();
+  }
+}
+
+void Player::updateVelocity(float deltaTime)
+{
+  constexpr float MIN_ACC = 5.0f;
+  constexpr float MAX_ACC = 20.0f;
+
+  const glm::vec3 target = targetWorldVelocity();
+  const glm::vec2 error{
+    target.x - velocity_.x,
+    target.z - velocity_.z
+  };
+
+  const float errorMagnitude = glm::length(error);
+
+  float acceleration = MIN_ACC;
+
+  if (errorMagnitude > 0.0f){
+    const float coefficient = glm::clamp(errorMagnitude / maxSpeed, 0.0f, 1.0f);
+    acceleration += (MAX_ACC - MIN_ACC) * coefficient;
+  }
+
+  const float maxDeltaV = acceleration * deltaTime;
+
+  glm::vec2 deltaV{0.0f, 0.0f};
+
+  if (errorMagnitude <= maxDeltaV){
+    deltaV = error;
+  } else if (errorMagnitude > 0.0f){
+    deltaV = error * maxDeltaV / errorMagnitude;
+  }
+
+  velocity_.x += deltaV.x;
+  velocity_.z += deltaV.y; // not typo
+
+  const float dVy = isAirborne() ? -deltaTime * GRAVITY : -velocity_.y;
+
+  velocity_.y += dVy;
+}
+
+const bool Player::isAirborne() const
+{
+  return (pos_.y > FLOOR + LANDING_TOLERANCE) || (velocity_.y > 0.0f);
 }

@@ -34,11 +34,10 @@ private:
   std::uniform_real_distribution<float> jumpDelayDistribution{minJumpDelay, maxJumpDelay};
 
   static constexpr float jumpRange_ = 1.0f;
-  static constexpr float frogGravity_ = 9.8f;
   static constexpr float jumpVertVelocity_ = 3.0f;
-  static constexpr float jumpHorizVelocity_ = jumpRange_ * frogGravity_ / (2 * jumpVertVelocity_);
+  static constexpr float jumpHorizVelocity_ = jumpRange_ * GRAVITY / (2 * jumpVertVelocity_);
   std::uniform_real_distribution<float> yawDistribution{0.0f, 2 * glm::pi<float>()};
-  static constexpr float landingTolerance_ = 0.05f;
+
 
   void doJump();
   void doLand();

@@ -18,8 +18,8 @@ void FrogEntity::update(float deltaTime)
     }
   } else if (state_ == FrogState::Leap){
     position_ += deltaTime * currentVelocity_;
-    currentVelocity_.y -= deltaTime * frogGravity_;
-    if (position_.y <= FLOOR + landingTolerance_ && currentVelocity_.y < 0.0f){
+    currentVelocity_.y -= deltaTime * GRAVITY;
+    if (position_.y <= FLOOR + LANDING_TOLERANCE && currentVelocity_.y < 0.0f){
       doLand();
     }
   }
