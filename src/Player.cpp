@@ -238,3 +238,8 @@ const bool Player::isAirborne() const
 {
   return (pos_.y > FLOOR + LANDING_TOLERANCE) || (velocity_.y > 0.0f);
 }
+
+const std::vector<ViewmodelRenderCall*> Player::viewModelVector() const
+{
+  return vmc_.callVector();
+}

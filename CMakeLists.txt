@@ -73,6 +73,7 @@ set(SOURCES
   src/renderer/SubRendererBase.cpp
   src/renderer/TextRenderer.cpp
   src/renderer/Texture.cpp
+  src/renderer/ViewmodelController.cpp
   src/renderer/VisibilitySystem.cpp
 )
 

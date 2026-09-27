@@ -5,6 +5,7 @@
 #include "CommonGeometry.hpp"
 #include "Input.hpp"
 #include "Maze.hpp"
+#include "ViewmodelController.hpp"
 
 class Player
 {
@@ -29,6 +30,8 @@ public:
 
   [[nodiscard]]
   bool goalReached() const noexcept;
+
+  const std::vector<ViewmodelRenderCall*> viewModelVector() const;
 
 private:
   Maze& maze_;
@@ -58,4 +61,6 @@ private:
   static constexpr float maxSpeed = 5.0f;
 
   const bool isAirborne() const;
+
+  ViewmodelController vmc_;
 };

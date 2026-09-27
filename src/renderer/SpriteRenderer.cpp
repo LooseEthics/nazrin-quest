@@ -214,6 +214,7 @@ void SpriteRenderer::drawViewModel(
 
   glUniform1i(spriteTextureLocation_, 0);
 
+  glDisable(GL_DEPTH_TEST);
   glDepthMask(GL_FALSE);
 
   glDrawArrays(
@@ -223,6 +224,7 @@ void SpriteRenderer::drawViewModel(
   );
 
   glDepthMask(GL_TRUE);
+  glEnable(GL_DEPTH_TEST);
 }
 
 void SpriteRenderer::calculateProjection()

@@ -159,17 +159,12 @@ void Game::renderPlaying()
         player_->camera()
       );
     }
-    renderer_->spriteRenderer().drawViewModel(
-      {
-        SpriteId::POV_Mantle,
-        0.0f,
-        glm::radians(-90.0f),
-        {2.0f, 2.0f},
-        {0.5f, 0.3f},
-        FlatTransform::Rot180
-      },
-      player_->camera()
-    );
+    for (auto call : player_->viewModelVector()){
+      renderer_->spriteRenderer().drawViewModel(
+        *call,
+        player_->camera()
+      );
+    }
   }
   else
     renderer_->mapRenderer().drawMap(player_->pos(), player_->yaw());
