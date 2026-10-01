@@ -1,76 +1,54 @@
 
-#include <glm/vec3.hpp>
-#include <stdexcept>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "Quad.hpp"
 
-const std::vector<Vertex> quadVertices(
-  glm::vec3 bottomLeft, glm::vec3 bottomRight,
-  glm::vec3 topLeft, glm::vec3 topRight,
+glm::vec2 transformUV(
+  glm::vec2 uv,
+  const FlatTransform& tf
+)
+{
+  uv -= glm::vec2{0.5f, 0.5f};
+
+  if (tf.flipX)
+    uv.x = -uv.x;
+
+  if (tf.flipY)
+    uv.y = -uv.y;
+
+  uv += glm::vec2{0.5f, 0.5f};
+
+  return uv;
+}
+
+const std::vector<Vertex> getQuadVertices(
+  glm::vec3 bottomLeft,
+  glm::vec3 bottomRight,
+  glm::vec3 topLeft,
+  glm::vec3 topRight,
   FlatTransform tf
 ) {
-  switch (tf) {
-    case FlatTransform::None:
-      return {
-        {bottomRight, glm::vec2{1.0f, 1.0f}},
-        {bottomLeft,  glm::vec2{0.0f, 1.0f}},
-        {topLeft,     glm::vec2{0.0f, 0.0f}},
+  // only applies uv flipping part of the transform
+  // do vertex rotation externally
+  const glm::vec2 bottomRightUV =
+    transformUV({1.0f, 1.0f}, tf);
 
-        {bottomRight, glm::vec2{1.0f, 1.0f}},
-        {topLeft,     glm::vec2{0.0f, 0.0f}},
-        {topRight,    glm::vec2{1.0f, 0.0f}}
-      };
-    case FlatTransform::Rot90:
-      return {
-        {bottomRight, glm::vec2{1.0f, 0.0f}},
-        {bottomLeft,  glm::vec2{1.0f, 1.0f}},
-        {topLeft,     glm::vec2{0.0f, 1.0f}},
+  const glm::vec2 bottomLeftUV =
+    transformUV({0.0f, 1.0f}, tf);
 
-        {bottomRight, glm::vec2{1.0f, 0.0f}},
-        {topLeft,     glm::vec2{0.0f, 1.0f}},
-        {topRight,    glm::vec2{0.0f, 0.0f}}
-      };
-    case FlatTransform::Rot180:
-      return {
-        {bottomRight, glm::vec2{0.0f, 0.0f}},
-        {bottomLeft,  glm::vec2{1.0f, 0.0f}},
-        {topLeft,     glm::vec2{1.0f, 1.0f}},
+  const glm::vec2 topLeftUV =
+    transformUV({0.0f, 0.0f}, tf);
 
-        {bottomRight, glm::vec2{0.0f, 0.0f}},
-        {topLeft,     glm::vec2{1.0f, 1.0f}},
-        {topRight,    glm::vec2{0.0f, 1.0f}}
-      };
-    case FlatTransform::Rot270:
-      return {
-        {bottomRight, glm::vec2{0.0f, 1.0f}},
-        {bottomLeft,  glm::vec2{0.0f, 0.0f}},
-        {topLeft,     glm::vec2{1.0f, 0.0f}},
+  const glm::vec2 topRightUV =
+    transformUV({1.0f, 0.0f}, tf);
 
-        {bottomRight, glm::vec2{0.0f, 1.0f}},
-        {topLeft,     glm::vec2{1.0f, 0.0f}},
-        {topRight,    glm::vec2{1.0f, 1.0f}}
-      };
-    case FlatTransform::FlipX:
-      return {
-        {bottomRight, glm::vec2{0.0f, 1.0f}},
-        {bottomLeft,  glm::vec2{1.0f, 1.0f}},
-        {topLeft,     glm::vec2{1.0f, 0.0f}},
+  return {
+    {bottomRight, bottomRightUV},
+    {bottomLeft,  bottomLeftUV},
+    {topLeft,     topLeftUV},
 
-        {bottomRight, glm::vec2{0.0f, 1.0f}},
-        {topLeft,     glm::vec2{1.0f, 0.0f}},
-        {topRight,    glm::vec2{0.0f, 0.0f}}
-      };
-    case FlatTransform::FlipY:
-      return {
-        {bottomRight, glm::vec2{1.0f, 0.0f}},
-        {bottomLeft,  glm::vec2{0.0f, 0.0f}},
-        {topLeft,     glm::vec2{0.0f, 1.0f}},
-
-        {bottomRight, glm::vec2{1.0f, 0.0f}},
-        {topLeft,     glm::vec2{0.0f, 1.0f}},
-        {topRight,    glm::vec2{1.0f, 1.0f}}
-      };
-    default:
-      throw std::invalid_argument("Invalid FlatTransform");
-  }
+    {bottomRight, bottomRightUV},
+    {topLeft,     topLeftUV},
+    {topRight,    topRightUV}
+  };
 }

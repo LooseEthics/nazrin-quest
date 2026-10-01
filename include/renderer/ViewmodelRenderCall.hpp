@@ -10,8 +10,8 @@
 struct ViewmodelRenderCall
 {
   SpriteId sprite;
-  float cameraRelativeYaw;
-  float worldRelativePitch;
+  glm::vec3 cameraRelativePos;
+  glm::vec3 localQuadNormal;
   glm::vec2 size;
   glm::vec2 uvAnchorPoint;
   FlatTransform tf;

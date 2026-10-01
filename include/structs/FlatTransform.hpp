@@ -1,12 +1,11 @@
 
 #pragma once
 
-enum class FlatTransform
+struct FlatTransform
 {
-  None,
-  Rot90,
-  Rot180,
-  Rot270,
-  FlipX,
-  FlipY
+  float rot;
+  bool flipX;
+  bool flipY;
 };
+
+constexpr FlatTransform NO_TRANSFORM{0.0f, false, false};

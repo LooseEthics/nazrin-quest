@@ -11,3 +11,4 @@ constexpr float LANDING_TOLERANCE = 0.05f;
 
 glm::vec3 forwardVector(float yaw, float pitch);
 glm::vec3 flatForwardVector(float yaw, float pitch);
+glm::vec3 rotate(glm::vec3 vector, float angle, glm::vec3 axis);

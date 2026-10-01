@@ -56,9 +56,10 @@ private:
   glm::vec3 velocity_{0.0f, 0.0f, 0.0f};
   glm::vec3 targetLocalVelocity_{0.0f, 0.0f, 0.0f};
   glm::vec3 targetWorldVelocity() const;
+  glm::vec3 localVelocity() const;
   void setTargetLocalVelocity(const Input& input);
-  void updateVelocity(float deltaTime);
   static constexpr float maxSpeed = 5.0f;
+  void updateVelocity(float deltaTime);
 
   const bool isAirborne() const;
 

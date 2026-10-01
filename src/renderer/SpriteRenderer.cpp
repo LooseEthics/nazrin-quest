@@ -1,4 +1,4 @@
-
+#include <iostream>
 #include <cstddef>
 #include <glad/gl.h>
 #include <glm/common.hpp>
@@ -94,7 +94,7 @@ void SpriteRenderer::drawSprite(
   const glm::vec3 topLeft     = bottomLeft + up * renderCall.height;
   const glm::vec3 topRight    = bottomRight + up * renderCall.height;
 
-  std::vector<Vertex> vertices = quadVertices(bottomLeft, bottomRight, topLeft, topRight, FlatTransform::None);
+  std::vector<Vertex> vertices = getQuadVertices(bottomLeft, bottomRight, topLeft, topRight, NO_TRANSFORM);
 
   glBindVertexArray(spriteVertexArray_);
   glBindBuffer(GL_ARRAY_BUFFER, spriteVertexBuffer_);
@@ -124,7 +124,7 @@ void SpriteRenderer::drawSprite(
     glm::value_ptr(view)
   );
 
-  const Texture& texture = sprites_.at(renderCall.sprite);
+  const Texture& texture = getTexture(renderCall.sprite);
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture.id());
@@ -142,33 +142,31 @@ void SpriteRenderer::drawSprite(
   glDepthMask(GL_TRUE);
 }
 
+void printVec3(glm::vec3 v){
+  std::cout << "(" << v.x << ", " << v.y << ", " << v.z << ")";
+}
+
 void SpriteRenderer::drawViewModel(
   ViewmodelRenderCall renderCall,
   const Camera& camera
 ) const {
-  constexpr float VIEWMODEL_RADIUS = 0.5f;
-
-  const float yaw = camera.yaw() + renderCall.cameraRelativeYaw;
-  const float pitch = renderCall.worldRelativePitch;
-
-  const float cosPitch = std::cos(pitch);
-
-  const glm::vec3 direction{
-    std::sin(yaw) * cosPitch,
-    std::sin(pitch),
-    std::cos(yaw) * cosPitch
-  };
-
-  const glm::vec3 center = camera.position() + direction * VIEWMODEL_RADIUS;
 
   const glm::vec3 worldUp = {0.0f, 1.0f, 0.0f};
 
-  const glm::vec3 right = glm::normalize(glm::cross(camera.forward(), worldUp));
+  const glm::vec3 center = camera.position() + rotate(renderCall.cameraRelativePos, -camera.yaw(), worldUp);
 
-  const glm::vec3 up = glm::cross(camera.forward(), right);
+  const glm::vec3 worldQuadNormal = glm::normalize(rotate(renderCall.localQuadNormal, -camera.yaw(), worldUp));
+  const glm::vec3 reference = std::abs(glm::dot(worldQuadNormal, worldUp)) < 0.999f ?
+    worldUp :
+    camera.forward();
+
+  const glm::vec3 right = glm::normalize(glm::cross(worldQuadNormal, reference));
+  const glm::vec3 rotatedRight = rotate(right, renderCall.tf.rot, worldQuadNormal);
+
+  const glm::vec3 up = glm::cross(worldQuadNormal, rotatedRight);
 
   const glm::vec2& uvAnchor = renderCall.uvAnchorPoint;
-  const glm::vec3 rightX = right * renderCall.size.x;
+  const glm::vec3 rightX = rotatedRight * renderCall.size.x;
   const glm::vec3 upY = up * renderCall.size.y;
 
   const glm::vec3 bottomLeft =  center - rightX * uvAnchor.x       - upY * uvAnchor.y;
@@ -177,7 +175,7 @@ void SpriteRenderer::drawViewModel(
   const glm::vec3 topRight =    center + rightX * (1 - uvAnchor.x) + upY * (1 - uvAnchor.y);
 
   const std::vector<Vertex> vertices =
-    quadVertices(bottomLeft, bottomRight, topLeft, topRight, renderCall.tf);
+    getQuadVertices(bottomLeft, bottomRight, topLeft, topRight, renderCall.tf);
 
   glBindVertexArray(spriteVertexArray_);
   glBindBuffer(GL_ARRAY_BUFFER, spriteVertexBuffer_);
@@ -207,7 +205,7 @@ void SpriteRenderer::drawViewModel(
     glm::value_ptr(view)
   );
 
-  const Texture& texture = sprites_.at(renderCall.sprite);
+  const Texture& texture = getTexture(renderCall.sprite);
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture.id());
@@ -235,4 +233,14 @@ void SpriteRenderer::calculateProjection()
     NEAR_CULLING_PLANE,
     FAR_CULLING_PLANE
   );
+}
+
+const Texture& SpriteRenderer::getTexture(SpriteId id) const
+{
+  auto it = sprites_.find(id);
+
+  if (it == sprites_.end())
+    return sprites_.at(SpriteId::Default);
+
+  return it->second;
 }

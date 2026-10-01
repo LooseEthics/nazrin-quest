@@ -43,6 +43,7 @@ void Player::update(const Input& input, float deltaTime)
   camera_.setPos(pos_ + cameraOffset());
   camera_.setRot(yaw_, pitch_);
 
+  vmc_.updateFlaps(localVelocity(), maxSpeed);
 }
 
 void Player::moveNoclip(float dx, float dy, float dz)
@@ -178,6 +179,18 @@ glm::vec3 Player::targetWorldVelocity() const
   const glm::vec3 right ={-forward.z, 0.0f, forward.x};
 
   return forward * targetLocalVelocity_.x + right * targetLocalVelocity_.z;
+}
+
+glm::vec3 Player::localVelocity() const
+{
+  const glm::vec3 forward = flatForwardVector(yaw_, 0.0f);
+  const glm::vec3 right ={-forward.z, 0.0f, forward.x};
+
+  return {
+    glm::dot(velocity_, forward),
+    velocity_.y,
+    glm::dot(velocity_, right)
+  };
 }
 
 void Player::setTargetLocalVelocity(const Input& input)

@@ -7,5 +7,6 @@ enum class SpriteId
   Cheese,
   Frog_Idle,
   Frog_Leap,
-  POV_Mantle
+  POV_Mantle,
+  POV_Flap
 };

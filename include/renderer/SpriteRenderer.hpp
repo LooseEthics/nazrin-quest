@@ -44,9 +44,13 @@ private:
 
   std::unordered_map<SpriteId, Texture> sprites_;
   const std::unordered_map<SpriteId, std::string> texturePaths_{
+    {SpriteId::Default, "assets/tex_debug.png"},
     {SpriteId::Cheese, "assets/cheese.png"},
     {SpriteId::Frog_Idle, "assets/frog_idle.png"},
     {SpriteId::Frog_Leap, "assets/frog_leap.png"},
-    {SpriteId::POV_Mantle, "assets/POV_mantle.png"}
+    {SpriteId::POV_Mantle, "assets/POV_mantle.png"},
+    {SpriteId::POV_Flap, "assets/POV_flap.png"}
   };
+
+  const Texture& getTexture(SpriteId id) const;
 };
