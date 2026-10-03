@@ -35,9 +35,12 @@ private:
 
   static constexpr float jumpRange_ = 1.0f;
   static constexpr float jumpVertVelocity_ = 3.0f;
-  static constexpr float jumpHorizVelocity_ = jumpRange_ * GRAVITY / (2 * jumpVertVelocity_);
+  static constexpr float airTime_ = 2 * jumpVertVelocity_ / GRAVITY;
+  static constexpr float jumpHorizVelocity_ = jumpRange_ / airTime_;
   std::uniform_real_distribution<float> yawDistribution{0.0f, 2 * glm::pi<float>()};
 
+  float angularVelocity_ = 0.0f;
+  static constexpr float jumpAngularVelocity_ = 2 * glm::pi<float>() / airTime_;
 
   void doJump();
   void doLand();

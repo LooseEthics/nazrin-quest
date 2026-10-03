@@ -94,7 +94,7 @@ void SpriteRenderer::drawSprite(
   const glm::vec3 topLeft     = bottomLeft + up * renderCall.height;
   const glm::vec3 topRight    = bottomRight + up * renderCall.height;
 
-  std::vector<Vertex> vertices = getQuadVertices(bottomLeft, bottomRight, topLeft, topRight, NO_TRANSFORM);
+  std::vector<Vertex> vertices = getQuadVertices(bottomLeft, bottomRight, topLeft, topRight, renderCall.tf);
 
   glBindVertexArray(spriteVertexArray_);
   glBindBuffer(GL_ARRAY_BUFFER, spriteVertexBuffer_);
@@ -175,7 +175,7 @@ void SpriteRenderer::drawViewModel(
   const glm::vec3 topRight =    center + rightX * (1 - uvAnchor.x) + upY * (1 - uvAnchor.y);
 
   const std::vector<Vertex> vertices =
-    getQuadVertices(bottomLeft, bottomRight, topLeft, topRight, renderCall.tf);
+    getQuadVerticesNoRot(bottomLeft, bottomRight, topLeft, topRight, renderCall.tf);
 
   glBindVertexArray(spriteVertexArray_);
   glBindBuffer(GL_ARRAY_BUFFER, spriteVertexBuffer_);

@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 
+#include "FlatTransform.hpp"
 #include "SpriteId.hpp"
 #include "SpriteRenderCall.hpp"
 
@@ -12,6 +13,7 @@ public:
   Entity(glm::vec3 position);
   Entity(glm::vec3 position, SpriteId sprite);
   Entity(glm::vec3 position, SpriteId sprite, float width, float height);
+  Entity(glm::vec3 position, SpriteId sprite, float width, float height, FlatTransform tf);
   virtual ~Entity() = default;
 
   virtual void update(float deltaTime) = 0;
@@ -31,4 +33,5 @@ protected:
   SpriteId sprite_;
   float spriteWidth_;
   float spriteHeight_;
+  FlatTransform tf_;
 };

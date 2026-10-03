@@ -20,3 +20,38 @@ const std::vector<Vertex> getQuadVertices(
   glm::vec3 topRight,
   FlatTransform tf
 );
+
+const std::vector<Vertex> getQuadVerticesNoRot(
+  glm::vec3 bottomLeft,
+  glm::vec3 bottomRight,
+  glm::vec3 topLeft,
+  glm::vec3 topRight,
+  FlatTransform tf
+);
+
+void rotateQuadAroundNormal(
+  glm::vec3& bottomLeft,
+  glm::vec3& bottomRight,
+  glm::vec3& topLeft,
+  glm::vec3& topRight,
+  float angle
+);
+
+void rotateQuadAroundNormal(
+  glm::vec3& bottomLeft,
+  glm::vec3& bottomRight,
+  glm::vec3& topLeft,
+  glm::vec3& topRight,
+  float angle,
+  const glm::vec2& uvAnchor
+);
+
+void rotateQuadAroundAxis(
+  glm::vec3& bottomLeft,
+  glm::vec3& bottomRight,
+  glm::vec3& topLeft,
+  glm::vec3& topRight,
+  float angle,
+  const glm::vec3& anchorPoint,
+  const glm::vec3& axis
+);

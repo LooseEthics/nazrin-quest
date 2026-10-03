@@ -11,10 +11,15 @@ Entity::Entity(glm::vec3 position, SpriteId sprite)
 {}
 
 Entity::Entity(glm::vec3 position, SpriteId sprite, float width, float height)
+  : Entity{position, sprite, width, height, NO_TRANSFORM}
+{}
+
+Entity::Entity(glm::vec3 position, SpriteId sprite, float width, float height, FlatTransform tf)
   : position_(position),
     sprite_(sprite),
     spriteWidth_(width),
-    spriteHeight_(height)
+    spriteHeight_(height),
+    tf_(tf)
 {}
 
 void Entity::setSprite(SpriteId sprite)
@@ -38,6 +43,7 @@ SpriteRenderCall Entity::renderCall() const {
     sprite_,
     position_,
     spriteWidth_,
-    spriteHeight_
+    spriteHeight_,
+    tf_
   };
 }
