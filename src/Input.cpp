@@ -73,9 +73,11 @@ bool Input::mouseCaptured() const noexcept {return mouseCaptured_;}
 
 float Input::mouseDeltaX() const noexcept {return mouseDeltaX_;}
 float Input::mouseDeltaY() const noexcept {return mouseDeltaY_;}
+float Input::mouseDeltaXBufferSum() const noexcept {return mouseDeltaXBuffer_.sum();}
 
 void Input::endFrame()
 {
+  mouseDeltaXBuffer_.push(mouseDeltaX_);
   mouseDeltaX_ = 0.0f;
   mouseDeltaY_ = 0.0f;
   keysPressed_.clear();

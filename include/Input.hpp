@@ -4,6 +4,8 @@
 #include <SDL3/SDL.h>
 #include <unordered_set>
 
+#include "RingBuffer.hpp"
+
 class Input
 {
 public:
@@ -22,6 +24,7 @@ public:
 
   float mouseDeltaX() const noexcept;
   float mouseDeltaY() const noexcept;
+  float mouseDeltaXBufferSum() const noexcept;
 
   void endFrame();
 
@@ -41,6 +44,8 @@ private:
 
   float mouseDeltaX_ = 0.0f;
   float mouseDeltaY_ = 0.0f;
+
+  RingBuffer<float, 5> mouseDeltaXBuffer_;
 
   std::unordered_set<SDL_Scancode> keysPressed_;
   std::unordered_set<SDL_Scancode> keysHeld_;

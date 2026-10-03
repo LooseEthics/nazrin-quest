@@ -18,7 +18,7 @@ public:
   ViewmodelController();
 
   const std::vector<ViewmodelRenderCall*>& callVector() const;
-  void updateFlaps(glm::vec3 velocity, float maxSpeed);
+  void updateFlaps(glm::vec3 velocity, float maxSpeed, float yawSpeed);
 
 private:
   std::vector<ViewmodelRenderCall*> callVector_;
@@ -44,4 +44,5 @@ private:
   const float flapMaxSway_ = 0.1f;
   const float flapBaseFloatAngle_ = 45.0f;
   const float flapMaxFloatAngleDiff_ = 15.0f;
+  const float flapSwayYawSpeedMult_ = 5.0f;
 };

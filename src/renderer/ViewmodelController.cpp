@@ -28,10 +28,10 @@ const std::vector<ViewmodelRenderCall*>& ViewmodelController::callVector() const
   return callVector_;
 }
 
-void ViewmodelController::updateFlaps(glm::vec3 localVelocity, float maxSpeed)
+void ViewmodelController::updateFlaps(glm::vec3 localVelocity, float maxSpeed, float yawSpeed)
 {
   const float flapFloatAngleDiff = glm::clamp(localVelocity.x / maxSpeed, -1.0f, 1.0f) * flapMaxFloatAngleDiff_;
-  const float flapSway = glm::clamp(localVelocity.z / maxSpeed, -flapMaxSway_, flapMaxSway_);
+  const float flapSway = glm::clamp(yawSpeed * flapSwayYawSpeedMult_ + localVelocity.z / maxSpeed, -flapMaxSway_, flapMaxSway_);
   for (std::size_t i = 0; i < flaps_.size(); ++i){
     auto& fc = flapCallVector_[i];
     auto& flap = flaps_[i];
