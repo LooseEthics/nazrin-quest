@@ -33,6 +33,9 @@ public:
 
   const std::vector<ViewmodelRenderCall*> viewModelVector() const;
 
+  [[nodiscard]]
+  float totalDistanceTravelled() const noexcept;
+
 private:
   Maze& maze_;
 
@@ -64,4 +67,6 @@ private:
   const bool isAirborne() const;
 
   ViewmodelController vmc_{maxSpeed};
+
+  float totalDistanceTravelled_ = 0.0f;
 };

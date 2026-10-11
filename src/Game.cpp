@@ -1,4 +1,5 @@
 
+#include <format>
 #include <iostream>
 
 #include "FrogEntity.hpp"
@@ -117,6 +118,8 @@ void Game::updatePlaying(float deltaTime)
   if (player_->goalReached()){
     state_ = GameState::Won;
   }
+
+  totalPlayTime_ += deltaTime;
 }
 
 void Game::updateWon(float deltaTime)
@@ -175,7 +178,10 @@ void Game::renderWon()
 {
   std::vector<std::string> winText{
     "CONGRASHUNZ!!!11!1!!1",
-    "YOU ARE A WINRAR!"
+    "YOU ARE A WINRAR!",
+    "",
+    "You travelled " + std::format("{:.2f}", player_->totalDistanceTravelled()) +  " m",
+    "and took " + std::format("{:.2f}", totalPlayTime_) + " s"
   };
 
   renderer_->clear();

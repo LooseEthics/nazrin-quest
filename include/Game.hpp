@@ -91,4 +91,6 @@ private:
   std::unique_ptr<VisibilitySystem> visibility_;
   std::set<Entity*> visibleEntities_;
   MazeCoord playerCell_;
+
+  float totalPlayTime_ = 0.0f;
 };

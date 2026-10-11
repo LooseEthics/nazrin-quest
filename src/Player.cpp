@@ -75,6 +75,8 @@ void Player::move(glm::vec3 displacement)
   candidate.z += dz;
   resolveCollision(candidate);
 
+  totalDistanceTravelled_ += glm::distance(candidate, pos_);
+
   pos_ = candidate;
 }
 
@@ -255,4 +257,9 @@ const bool Player::isAirborne() const
 const std::vector<ViewmodelRenderCall*> Player::viewModelVector() const
 {
   return vmc_.callVector();
+}
+
+float Player::totalDistanceTravelled() const noexcept
+{
+  return totalDistanceTravelled_;
 }
