@@ -5,29 +5,32 @@
 #include <glm/vec3.hpp>
 #include <random>
 
-#include "Entity.hpp"
+#include "PhysicalEntity.hpp"
 #include "Maze.hpp"
 
-class FrogEntity : public Entity
+class FrogEntity : public PhysicalEntity
 {
 public:
-  FrogEntity(Maze& maze, glm::vec3 position);
+  FrogEntity(glm::vec3 position, Maze& maze);
 
   void update(float deltaTime) override;
+  void move(float deltaTime) override;
 
   enum FrogState
   {
     Idle,
-    Leap
+    Leap,
+    Splatted
   };
 
 private:
   FrogState state_ = Idle;
   float timer_ = 0.0f;
   float nextJumpTime_ = 5.0f;
-  glm::vec3 currentVelocity_ = {0.0f, 0.0f, 0.0f};
   std::mt19937 rng_;
-  Maze& maze_;
+
+  void moveLeaping(float deltaTime);
+  void moveSplat(float deltaTime);
 
   static constexpr float minJumpDelay = 1.0f;
   static constexpr float maxJumpDelay = 10.0f;
@@ -44,4 +47,7 @@ private:
 
   void doJump();
   void doLand();
+  void doSplat();
+
+  static constexpr float splatGravityMult_ = 0.2f;
 };

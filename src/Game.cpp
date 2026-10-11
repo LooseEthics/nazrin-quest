@@ -238,7 +238,7 @@ void Game::startGame()
   player_ = std::make_unique<Player>(*maze_);
 
   entities_.push_back(std::make_unique<GoalEntity>(maze_->getGoalCoords()));
-  entities_.push_back(std::make_unique<FrogEntity>(*maze_, player_->pos()));
+  entities_.push_back(std::make_unique<FrogEntity>(player_->pos(), *maze_));
 
   renderer_->mazeRenderer().uploadMesh(*mesh_);
   renderer_->mapRenderer().createMapTexture(*maze_);

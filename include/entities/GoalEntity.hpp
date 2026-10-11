@@ -9,6 +9,7 @@ public:
   GoalEntity(glm::vec3 position);
 
   void update(float deltaTime) override;
+  void move(float deltaTime) override;
 
 private:
   const float y0_;

@@ -17,6 +17,7 @@ public:
   virtual ~Entity() = default;
 
   virtual void update(float deltaTime) = 0;
+  virtual void move(float deltaTime) = 0;
 
   void setSprite(SpriteId sprite);
   void setSpriteSize(float width, float height);

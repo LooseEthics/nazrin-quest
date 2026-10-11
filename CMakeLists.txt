@@ -63,6 +63,7 @@ set(SOURCES
   src/entities/Entity.cpp
   src/entities/FrogEntity.cpp
   src/entities/GoalEntity.cpp
+  src/entities/PhysicalEntity.cpp
   src/renderer/Camera.cpp
   src/renderer/MapRenderer.cpp
   src/renderer/MazeRenderer.cpp

@@ -46,8 +46,8 @@ private:
   Camera camera_;
   glm::vec3 cameraOffset();
 
-  static constexpr float maxPitch = glm::radians(75.0f);
-  static constexpr float collisionRadius = CELL_SIZE / 8.0f;
+  static constexpr float maxPitch_ = glm::radians(75.0f);
+  static constexpr float collisionRadius_ = CELL_SIZE / 8.0f;
   void resolveVertCollision(glm::vec3& position);
   void resolveCollision(glm::vec3& position);
   void resolveCircleAABB(
@@ -61,12 +61,12 @@ private:
   glm::vec3 targetWorldVelocity() const;
   glm::vec3 localVelocity() const;
   void setTargetLocalVelocity(const Input& input);
-  static constexpr float maxSpeed = 5.0f;
+  static constexpr float maxSpeed_ = 5.0f;
   void updateVelocity(float deltaTime);
 
   const bool isAirborne() const;
 
-  ViewmodelController vmc_{maxSpeed};
+  ViewmodelController vmc_{maxSpeed_};
 
   float totalDistanceTravelled_ = 0.0f;
 };

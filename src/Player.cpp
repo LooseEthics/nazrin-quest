@@ -89,10 +89,10 @@ void Player::resolveVertCollision(glm::vec3& position)
 
 void Player::resolveCollision(glm::vec3& position)
 {
-  const int minCellX = static_cast<int>(std::floor((position.x - collisionRadius) / CELL_SIZE));
-  const int maxCellX = static_cast<int>(std::floor((position.x + collisionRadius) / CELL_SIZE));
-  const int minCellZ = static_cast<int>(std::floor((position.z - collisionRadius) / CELL_SIZE));
-  const int maxCellZ = static_cast<int>(std::floor((position.z + collisionRadius) / CELL_SIZE));
+  const int minCellX = static_cast<int>(std::floor((position.x - collisionRadius_) / CELL_SIZE));
+  const int maxCellX = static_cast<int>(std::floor((position.x + collisionRadius_) / CELL_SIZE));
+  const int minCellZ = static_cast<int>(std::floor((position.z - collisionRadius_) / CELL_SIZE));
+  const int maxCellZ = static_cast<int>(std::floor((position.z + collisionRadius_) / CELL_SIZE));
 
   for (int z = minCellZ; z <= maxCellZ; ++z){
     for (int x = minCellX; x <= maxCellX; ++x){
@@ -127,7 +127,7 @@ void Player::resolveCircleAABB(
   float dz = position.z - closestZ;
 
   const float distanceSquared = dx * dx + dz * dz;
-  const float radiusSquared = collisionRadius * collisionRadius;
+  const float radiusSquared = collisionRadius_ * collisionRadius_;
 
   if (distanceSquared >= radiusSquared) return;
 
@@ -137,7 +137,7 @@ void Player::resolveCircleAABB(
   const float distance = std::sqrt(distanceSquared);
 
   if (distance > 0.0f){
-    float penetration = collisionRadius - distance;
+    float penetration = collisionRadius_ - distance;
 
     position.x += dx / distance * penetration;
     position.z += dz / distance * penetration;
@@ -150,8 +150,8 @@ void Player::rotate(float dYaw, float dPitch, bool pitchClamp)
   if (pitchClamp)
     pitch_ = glm::clamp(
       pitch_ + dPitch,
-      -maxPitch,
-      maxPitch
+      -maxPitch_,
+      maxPitch_
     );
   else
     pitch_ += dPitch;
@@ -204,7 +204,7 @@ void Player::setTargetLocalVelocity(const Input& input)
   if (input.right()) targetLocalVelocity_.z += 1.0;
   if (input.left()) targetLocalVelocity_.z -= 1.0;
 
-  targetLocalVelocity_ *= maxSpeed;
+  targetLocalVelocity_ *= maxSpeed_;
 
   if (targetLocalVelocity_.x != 0 && targetLocalVelocity_.z != 0){
     targetLocalVelocity_ *= glm::one_over_root_two<float>();
@@ -227,7 +227,7 @@ void Player::updateVelocity(float deltaTime)
   float acceleration = MIN_ACC;
 
   if (errorMagnitude > 0.0f){
-    const float coefficient = glm::clamp(errorMagnitude / maxSpeed, 0.0f, 1.0f);
+    const float coefficient = glm::clamp(errorMagnitude / maxSpeed_, 0.0f, 1.0f);
     acceleration += (MAX_ACC - MIN_ACC) * coefficient;
   }
 
