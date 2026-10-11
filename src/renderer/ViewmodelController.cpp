@@ -5,8 +5,50 @@
 #include "SpriteId.hpp"
 #include "ViewmodelController.hpp"
 
-ViewmodelController::ViewmodelController()
+ViewmodelController::ViewmodelController(float maxSpeed)
+  : maxSpeed_(maxSpeed)
 {
+  assert(maxSpeed > 0.0f);
+
+  shoes_.push_back({
+    true,
+    {
+      shoeBaseForward_,
+      shoeVertOffset,
+      shoeSideOffset_
+    }
+  });
+  shoes_.push_back({
+    false,
+    {
+      shoeBaseForward_,
+      shoeVertOffset,
+      -shoeSideOffset_
+    }
+  });
+
+  shoeCallVector_.push_back({
+    SpriteId::POV_Shoe,
+    shoes_[0].cameraRelativePos,
+    {0.0f, 1.0f, 0.0f},
+    {0.5f, 0.5f},
+    {0.5f, 0.5f},
+    {glm::pi<float>(), false, false}
+  });
+
+  shoeCallVector_.push_back({
+    SpriteId::POV_Shoe,
+    shoes_[1].cameraRelativePos,
+    {0.0f, 1.0f, 0.0f},
+    {0.5f, 0.5f},
+    {0.5f, 0.5f},
+    {glm::pi<float>(), true, false}
+  });
+
+  for (auto& fc : shoeCallVector_){
+    callVector_.push_back(&fc);
+  }
+
   initializeFlaps();
   for (auto& fc : flapCallVector_){
     callVector_.push_back(&fc);
@@ -28,10 +70,16 @@ const std::vector<ViewmodelRenderCall*>& ViewmodelController::callVector() const
   return callVector_;
 }
 
-void ViewmodelController::updateFlaps(glm::vec3 localVelocity, float maxSpeed, float yawSpeed)
+void ViewmodelController::update(const glm::vec3& localVelocity, float yawSpeed, float deltaTime)
 {
-  const float flapFloatAngleDiff = glm::clamp(localVelocity.x / maxSpeed, -1.0f, 1.0f) * flapMaxFloatAngleDiff_;
-  const float flapSway = glm::clamp(yawSpeed * flapSwayYawSpeedMult_ + localVelocity.z / maxSpeed, -flapMaxSway_, flapMaxSway_);
+  updateFlaps(localVelocity, yawSpeed);
+  updateShoes(localVelocity, deltaTime);
+}
+
+void ViewmodelController::updateFlaps(const glm::vec3& localVelocity, float yawSpeed)
+{
+  const float flapFloatAngleDiff = glm::clamp(localVelocity.x / maxSpeed_, -1.0f, 1.0f) * flapMaxFloatAngleDiff_;
+  const float flapSway = glm::clamp(yawSpeed * flapSwayYawSpeedMult_ + localVelocity.z / maxSpeed_, -flapMaxSway_, flapMaxSway_);
   for (std::size_t i = 0; i < flaps_.size(); ++i){
     auto& fc = flapCallVector_[i];
     auto& flap = flaps_[i];
@@ -96,4 +144,21 @@ void ViewmodelController::initializeFlaps()
       flapTf_
     });
   }
+}
+
+void ViewmodelController::updateShoes(const glm::vec3& localVelocity, float deltaTime){
+  const float velocityFactor = glm::clamp(localVelocity.x / maxSpeed_, -1.0f, 1.0f);
+
+  shoeCycleParam_ += velocityFactor * deltaTime;
+  if (shoeCycleParam_ > 1.0f) shoeCycleParam_ -= 1.0f;
+  else if (shoeCycleParam_ < 0.0f) shoeCycleParam_ += 1.0f;
+
+  float rShoeForward = std::sin(2 * glm::pi<float>() * shoeCycleParam_);
+  float lShoeForward = std::sin(2 * glm::pi<float>() * shoeCycleParam_ + glm::pi<float>());
+
+  rShoeForward *= (rShoeForward >= 0.0f ? shoeMaxForward_ : shoeMaxBackward_);
+  lShoeForward *= (lShoeForward >= 0.0f ? shoeMaxForward_ : shoeMaxBackward_);
+
+  shoeCallVector_[0].cameraRelativePos.x = shoeBaseForward_ + rShoeForward;
+  shoeCallVector_[1].cameraRelativePos.x = shoeBaseForward_ + lShoeForward;
 }

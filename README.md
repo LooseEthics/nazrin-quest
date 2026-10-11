@@ -13,6 +13,7 @@ The goal is to find the cheese.
 * Player movement and wall collision
 * Configurable maze parameters
 * In-game map with position tracking
+* A froggy friend
 
 ## Requirements
 
@@ -62,11 +63,17 @@ The goal is in the cell with greatest distance from the start position.
 
 Prototype / technical test.
 
+## WIP
+
+* First person player model
+
 ## Planned features
 
+* Light system
+* Sound system
+* Frog utility
 * Glass maze
 * Mirror maze
-* First person player model
 
 ## Screenshot
 

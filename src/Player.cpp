@@ -43,7 +43,7 @@ void Player::update(const Input& input, float deltaTime)
   camera_.setPos(pos_ + cameraOffset());
   camera_.setRot(yaw_, pitch_);
 
-  vmc_.updateFlaps(localVelocity(), maxSpeed, input.mouseDeltaXBufferSum() * LOOK_SPEED);
+  vmc_.update(localVelocity(), input.mouseDeltaXBufferSum() * LOOK_SPEED, deltaTime);
 }
 
 void Player::moveNoclip(float dx, float dy, float dz)

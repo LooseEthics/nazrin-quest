@@ -8,5 +8,6 @@ enum class SpriteId
   Frog_Idle,
   Frog_Leap,
   POV_Mantle,
-  POV_Flap
+  POV_Flap,
+  POV_Shoe
 };

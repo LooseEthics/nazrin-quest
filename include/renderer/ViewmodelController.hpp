@@ -6,26 +6,31 @@
 
 #include "ViewmodelRenderCall.hpp"
 
-struct Flap
-{
-  float baseYaw;
-  glm::vec3 cameraRelativePos;
-};
-
 class ViewmodelController
 {
 public:
-  ViewmodelController();
+  ViewmodelController(float maxSpeed);
 
   const std::vector<ViewmodelRenderCall*>& callVector() const;
-  void updateFlaps(glm::vec3 velocity, float maxSpeed, float yawSpeed);
+  void update(const glm::vec3& velocity, float yawSpeed, float deltaTime);
 
 private:
+  void updateFlaps(const glm::vec3& velocity, float yawSpeed);
+  void updateShoes(const glm::vec3& velocity, float deltaTime);
+
   std::vector<ViewmodelRenderCall*> callVector_;
+
+  const int maxSpeed_;
 
   ViewmodelRenderCall mantleCall_;
 
   void initializeFlaps();
+
+  struct Flap
+  {
+    float baseYaw;
+    glm::vec3 cameraRelativePos;
+  };
 
   std::vector<Flap> flaps_;
   std::vector<ViewmodelRenderCall> flapCallVector_;
@@ -45,4 +50,20 @@ private:
   const float flapBaseFloatAngle_ = 45.0f;
   const float flapMaxFloatAngleDiff_ = 15.0f;
   const float flapSwayYawSpeedMult_ = 5.0f;
+
+  struct Shoe
+  {
+    bool isRight;
+    glm::vec3 cameraRelativePos;
+  };
+
+  std::vector<Shoe> shoes_;
+  std::vector<ViewmodelRenderCall> shoeCallVector_;
+  float shoeCycleParam_ = 0.0f;
+
+  const float shoeMaxForward_ = 0.15f;
+  const float shoeMaxBackward_ = 0.1f;
+  const float shoeSideOffset_ = 0.2f;
+  const float shoeVertOffset = -0.8f;
+  const float shoeBaseForward_ = -0.2f;
 };

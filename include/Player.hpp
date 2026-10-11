@@ -63,5 +63,5 @@ private:
 
   const bool isAirborne() const;
 
-  ViewmodelController vmc_;
+  ViewmodelController vmc_{maxSpeed};
 };
